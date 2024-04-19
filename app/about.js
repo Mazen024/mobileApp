@@ -40,6 +40,7 @@ const About = () => {
   return (
     <View style={styles.container}>
       <SafeAreaView style={styles.container}>
+        <Text style={styles.userText}>{email ? `Welcome, ${email}` : "Welcome, Guest"}</Text>
         <Text style={styles.userText}>{username ? `Welcome, ${username}` : "Welcome, Guest"}</Text>
         <FlatList
           style={styles.backYellow}
