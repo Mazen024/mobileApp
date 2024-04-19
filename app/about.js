@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View, SafeAreaView, FlatList } from "react-native";
+import { StyleSheet, Text, View, SafeAreaView, FlatList, Pressable } from "react-native";
 import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams , router} from "expo-router";
+import { getAuth, signOut } from "firebase/auth";
 
 import Item from "./Item";
 
 const About = () => {
-  const { email } = useLocalSearchParams();
-  const { username } = useLocalSearchParams();
+  const { userId , username} = useLocalSearchParams();
 
   const [data, setData] = useState([]);
 
@@ -37,10 +37,27 @@ const About = () => {
     fetchData(); 
   }, []);
 
+  const handleSignOut = async () => {
+    try {
+      const auth = getAuth();
+      await signOut(auth);
+      router.push("/login");
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <SafeAreaView style={styles.container}>
-        <Text style={styles.userText}>{email ? `Welcome, ${email}` : "Welcome, Guest"}</Text>
+        {username?(  
+          <Pressable style={styles.signOutButton} onPress={handleSignOut}>
+            <Text style={styles.signOutButtonText}>Sign Out</Text>
+          </Pressable>
+        ):(
+          <></>
+        )
+        }
         <Text style={styles.userText}>{username ? `Welcome, ${username}` : "Welcome, Guest"}</Text>
         <FlatList
           style={styles.backYellow}
@@ -85,5 +102,18 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 40,
     textAlign: "center",
+  },
+  signOutButton: {
+    backgroundColor: "blue",
+    paddingVertical: 5,
+    paddingHorizontal: 5,
+    borderRadius: 5,
+    marginTop: 10,
+    left: '35%'
+  },
+  signOutButtonText: {
+    color: "white",
+    fontSize: 18,
+    fontWeight: "bold",
   },
 });

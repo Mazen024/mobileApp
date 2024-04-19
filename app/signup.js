@@ -127,10 +127,12 @@
 
 
 import React, { useState } from "react";
-import { Link, router, useLocalSearchParams } from "expo-router";
+import { Link, router } from "expo-router";
 import { StyleSheet, View, TextInput, TouchableOpacity, Text } from "react-native";
 import { firebase } from "../firebase";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { collection, addDoc } from "firebase/firestore";
+import { db } from "../firebase";
 
 const CustomAlert = ({ message }) => (
   <View style={styles.alertContainer}>
@@ -153,20 +155,22 @@ const SignUp = () => {
 
     try {
       const auth = getAuth();
-      await createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        // Signed up 
-        const user = userCredential.user;
-        // console.log(user.uid);
-        const users = user.uid;
-        // ...
-      })
-      
-      // If sign-up is successful, navigate to the about page
-      router.push(`/about?username=${username}`);
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      const userId = user.uid;
+
+      // Save user data in Firestore collection
+      const userData = {
+        name: username,
+        email: email,
+        password: password,
+        userId: userId,
+      };
+      await addDoc(collection(db, "users"), userData);
+
+      router.push(`/about?userId=${userId}&username=${username}`);
     } catch (error) {
       console.error("Error signing up:", error.message);
-      // Set error message
       setError(error.message);
     }
   };

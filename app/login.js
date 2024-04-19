@@ -120,48 +120,74 @@
 // });
 
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { StyleSheet, View, TextInput, Pressable, Text } from "react-native";
 import { Link, router } from "expo-router";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { db } from "../firebase";
 
 const CustomAlert = ({ message }) => (
-    <View style={styles.alertContainer}>
-      <Text style={styles.alertText}>{message}</Text>
-    </View>
-  );
+  <View style={styles.alertContainer}>
+    <Text style={styles.alertText}>{message}</Text>
+  </View>
+);
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState(null);
+  const [username, setUsername] = useState("");
+
+  useEffect(() => {
+    if (username) {
+      handleLoginAndNavigate();
+    }
+  }, [username]);
 
   const handleLogin = async () => {
     try {
       const auth = getAuth();
-      await signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        // Signed up 
-        const user = userCredential.user;
-        // console.log(user.uid);
-        const users = user.uid;
-        // ...
-      })
-      router.push(`/about?email=${email}`);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      const userId = user.uid;
 
+      const usersRef = collection(db, "users");
+      const userQuery = query(usersRef, where("userId", "==", userId));
+      const querySnapshot = await getDocs(userQuery);
+      if (!querySnapshot.empty) {
+        const userData = querySnapshot.docs[0].data();
+        return userData.name;
+      } else {
+        throw new Error("User not found");
+      }
     } catch (error) {
       console.error("Error logging in:", error);
-      setErrors("Error logging in:", error);
+      setErrors("Error logging in:", error.message); // Access error message directly
+      return null;
     }
   };
-  
+
+  const handleLoginAndNavigate = async () => {
+    const username = await handleLogin();
+    if (username !== null) {
+      const auth = getAuth();
+      const user = auth.currentUser;
+      const userId = user.uid;
+      router.push(`/about?userId=${userId}&username=${username}`);
+    }
+  };
+
+  const handleLoginButtonPress = async () => {
+    setUsername(await handleLogin());
+  };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Login</Text>
       <TextInput
         style={styles.input}
-        placeholder="Username"
+        placeholder="Email"
         onChangeText={setEmail}
         value={email}
       />
@@ -172,7 +198,7 @@ const Login = () => {
         value={password}
         secureTextEntry
       />
-      <Pressable style={styles.button} onPress={handleLogin}>
+      <Pressable style={styles.button} onPress={handleLoginButtonPress}>
         <Text style={styles.buttonText}>Login</Text>
       </Pressable>
       <Text style={styles.link}>
