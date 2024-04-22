@@ -11,13 +11,14 @@ const _layout = () => {
         },
         headerTintColor: "indigo",
       }}
-    >
+      >
+      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen
         name="index"
         options={{
           headerTitle: "Home",
           headerRight: () => (
-            <Pressable onPress={() => router.push("login")}>
+            <Pressable onPress={() => router.replace("login")}>
               <Text style={styles.link}>Login</Text>
             </Pressable>
           ),
@@ -28,7 +29,6 @@ const _layout = () => {
         name="blog/index"
         options={{ headerTitle: "All Blog Posts" }}
       />
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen
         name="contact"
         options={{ headerTitle: "Contact", presentation: "modal" }}

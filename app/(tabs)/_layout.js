@@ -10,15 +10,15 @@ const _layout = () => {
         <Tabs.Screen
           name="feed"
           options={{
-            tabBarIcon: () => <Feather name="list" size={24} color="black" />,
-            tabBarLabel: "Feed",
+            tabBarIcon: () => <Feather name="home" size={24} color="black" />,
+            tabBarLabel: "Home",
           }}
         />
         <Tabs.Screen
           name="profile"
           options={{
             tabBarIcon: () => <AntDesign name="user" size={24} color="black" />,
-            tabBarLabel: "USERS",
+            tabBarLabel: "Profile",
           }}
         />
       </Tabs>

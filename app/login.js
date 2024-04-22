@@ -163,7 +163,7 @@ const Login = () => {
       }
     } catch (error) {
       console.error("Error logging in:", error);
-      setErrors("Error logging in:", error.message); // Access error message directly
+      setErrors("Error logging in:", error.message);
       return null;
     }
   };
@@ -174,7 +174,11 @@ const Login = () => {
       const auth = getAuth();
       const user = auth.currentUser;
       const userId = user.uid;
-      router.push(`/about?userId=${userId}&username=${username}`);
+      if (userId === "QE0qSKZoQwRmmLKgFVWSco8Jfu32") {
+        router.replace("/dashboard");
+      } else {
+        router.replace(`/feed?userId=${userId}&username=${username}`);
+      }
     }
   };
 

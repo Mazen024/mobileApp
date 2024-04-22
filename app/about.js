@@ -41,7 +41,7 @@ const About = () => {
     try {
       const auth = getAuth();
       await signOut(auth);
-      router.push("/login");
+      router.replace("/login");
     } catch (error) {
       console.error("Error signing out:", error);
     }
@@ -55,7 +55,9 @@ const About = () => {
             <Text style={styles.signOutButtonText}>Sign Out</Text>
           </Pressable>
         ):(
-          <></>
+          <Pressable style={styles.signOutButton} onPress={() => router.push('./l')}>
+            <Text style={styles.signOutButtonText}>Login</Text>
+          </Pressable>
         )
         }
         <Text style={styles.userText}>{username ? `Welcome, ${username}` : "Welcome, Guest"}</Text>

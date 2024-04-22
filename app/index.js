@@ -3,16 +3,17 @@ import React from "react";
 import { Link } from "expo-router";
 import About from "./about";
 
+
 const index = () => {
   return (
     <View style={styles.container}>
-      <About />
+      {/* <About /> */}
       <Link style={styles.button} href={"/(tabs)/feed"} asChild>
         <Pressable>
           <Text style={styles.link}>Go To Tabs</Text>
         </Pressable>
       </Link>
-    </View>
+   </View>
   );
 };
 
