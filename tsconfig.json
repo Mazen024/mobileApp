@@ -1,5 +1,4 @@
 {
-  "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "strict": true,
     "paths": {
@@ -12,6 +11,19 @@
     "**/*.ts",
     "**/*.tsx",
     ".expo/types/**/*.ts",
-    "expo-env.d.ts"
-  ]
+    "expo-env.d.ts",
+    "app/(tabs)/_layout.jsx",
+    "app/(tabs)/profile.jsx",
+    "app/(tabs)/Home.jsx",
+    "app/_layout.jsx",
+    "app/+html.jsx",
+    "app/+not-found.jsx",
+    "app/modal.jsx",
+    "components/EditScreenInfo.jsx",
+    "components/ExternalLink.jsx",
+    "components/StyledText.jsx",
+    "components/Themed.jsx",
+    "constants/Colors.js"
+  ],
+  "extends": "expo/tsconfig.base"
 }

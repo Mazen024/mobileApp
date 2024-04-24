@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, Image } from 'react-native';
 import { useLocalSearchParams } from "expo-router";
 import { collection, query, where, getDocs } from "firebase/firestore";
-import { db } from '../firebase'; // Import your Firestore instance
+import { db } from '../firebase'; 
 
 export default function PressedItem() {
   const { name } = useLocalSearchParams();
@@ -11,10 +11,6 @@ export default function PressedItem() {
   useEffect(() => {
     const fetchItemData = async () => {
       try {
-        // const usersRef = collection(db, "Products");
-        // const q = query(usersRef, where("name", "==", name));
-        // const querySnapshot = await getDocs(q);
-        //or
         const querySnapshot = await getDocs(query(collection(db, "Products"),where("name", "==", name)));
 
         if (!querySnapshot.empty) {
@@ -54,11 +50,12 @@ export default function PressedItem() {
 const styles = StyleSheet.create({
     container: {
       flex: 1,
+      backgroundColor: '#F0F0F0',
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'flex-start',
       paddingHorizontal: 20,
-      paddingVertical: 20,
+      paddingVertical: "15%",
     },
     textContainer: {
       marginTop: '10%',

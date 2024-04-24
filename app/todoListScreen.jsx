@@ -32,7 +32,6 @@ const TodoListScreen = () => {
     try {
       const auth = getAuth();
       await signOut(auth);
-      // Redirect to login screen after sign out
       router.push("/login");
     } catch (error) {
       console.error("Error signing out:", error);

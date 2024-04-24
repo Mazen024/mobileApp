@@ -1,19 +1,13 @@
-import { StyleSheet, Text, View, Pressable } from "react-native";
+import { StyleSheet, Text, View, Pressable  , TextInput} from "react-native";
 import React from "react";
 import { router } from "expo-router";
 
-const contact = () => {
+export default function search() {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Contact Page</Text>
-      <Pressable style={styles.button} onPress={() => router.back()}>
-        <Text style={styles.link}>Go Back</Text>
-      </Pressable>
     </View>
   );
 };
-
-export default contact;
 
 const styles = StyleSheet.create({
   container: {
@@ -29,6 +23,14 @@ const styles = StyleSheet.create({
   link: {
     fontSize: 22,
     color: "white",
+  },
+  input: {
+    width: "80%",
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 10,
   },
   button: {
     paddingVertical: 7,
