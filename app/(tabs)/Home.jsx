@@ -129,45 +129,29 @@ import {
   Pressable,
   TextInput,
   Animated,
-  Dimensions, // Import Dimensions for screen width
+  Dimensions,
 } from 'react-native';
-import { getDocs, collection } from 'firebase/firestore';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getDocs, collection, onSnapshot } from 'firebase/firestore';
 import { db } from '../../firebase';
-import { getAuth, signOut } from 'firebase/auth';
 import { useLocalSearchParams, router } from 'expo-router';
 import Item from '../Item';
 
-const { width } = Dimensions.get('window'); // Get screen width
+const { width } = Dimensions.get('window');
 
 export default function Home() {
-  const { username } = useLocalSearchParams();
   const [data, setData] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredData, setFilteredData] = useState([]);
-  const animatedValue = new Animated.Value(0); // For animations and transitions
+  const animatedValue = new Animated.Value(0);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const storedData = await AsyncStorage.getItem('productData');
-        const parsedData = storedData ? JSON.parse(storedData) : [];
+    const unsubscribe = onSnapshot(collection(db, 'Products'), (snapshot) => {
+      const fetchedData = snapshot.docs.map((doc) => doc.data());
+      setData(fetchedData);
+      setFilteredData(fetchedData);
+    });
 
-        const querySnapshot = await getDocs(collection(db, 'Products'));
-        const fetchedData = querySnapshot.docs.map((doc) => doc.data());
-
-        if (parsedData.length !== fetchedData.length) {
-          await AsyncStorage.setItem('productData', JSON.stringify(fetchedData));
-        }
-
-        setData(fetchedData);
-        setFilteredData(fetchedData);
-      } catch (error) {
-        console.error('Error fetching data: ', error);
-      }
-    };
-
-    fetchData();
+    return () => unsubscribe();
   }, []);
 
   useEffect(() => {
@@ -178,13 +162,16 @@ export default function Home() {
     setFilteredData(filterResults);
   }, [searchTerm, data]);
 
-  const handleSignOut = async () => {
+  const addToCart = async (itemId) => {
     try {
-      const auth = getAuth();
-      await signOut(auth);
-      router.push('/login');
+      await addDoc(collection(db, 'Cart'), {
+        userId: userId,
+        itemId: itemId,
+        quantity: 1,
+      });
+      console.log('Item added to cart');
     } catch (error) {
-      console.error('Error signing out:', error);
+      console.error('Error adding item to cart:', error);
     }
   };
 
@@ -202,23 +189,26 @@ export default function Home() {
         data={filteredData}
         renderItem={({ item, index }) => (
           <Animated.View
-          style={[
-            styles.itemContainer,
-            {
-                marginRight: index % 2 === 0 ? 10 : 0, // Add right margin for every odd index
-                marginLeft: index % 2 === 0 ? 0 : 10, // Add left margin for every even index
+            style={[
+              styles.itemContainer,
+              {
+                marginRight: index % 2 === 0 ? 10 : 0,
+                marginLeft: index % 2 === 0 ? 0 : 10,
               },
             ]}
-            >
+          >
             <Item
               name={item.name}
               price={item.price}
               image={item.image}
-              />
+            />
+            <Pressable onPress={() => addToCart(item.id)}>
+              <Text>Add to Cart</Text>
+            </Pressable>
           </Animated.View>
         )}
         keyExtractor={(item) => item.id}
-        numColumns={2} // Render two columns
+        numColumns={2}
         ListEmptyComponent={
           <Text style={styles.emptyText}>No products found</Text>
         }
@@ -260,18 +250,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   itemContainer: {
-    width: (width - 60) / 2, // Calculate width based on screen width and margins
+    width: (width - 60) / 2,
     backgroundColor: '#FFFFFF',
     padding: 10,
     borderRadius: 10,
-    // shadowColor: '#000',
-    // shadowOffset: {
-    //   width: 0,
-    //   height: 2,
-    // },
-    // shadowOpacity: 0.1,
-    // shadowRadius: 4,
-    // elevation: 3,
     marginBottom: 15,
   },
   emptyText: {
