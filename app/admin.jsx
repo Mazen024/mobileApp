@@ -22,6 +22,7 @@
 // }, []);
 
 
+
 import React, { useEffect, useState } from 'react';
 import {
   Text,
@@ -32,22 +33,20 @@ import {
   Pressable,
   TextInput,
   Animated,
-  Modal, // Import Modal component
 } from 'react-native';
-import { getDocs, collection, onSnapshot } from 'firebase/firestore';
+import { getDocs, collection, onSnapshot} from 'firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { db } from '../firebase';
 import { getAuth, signOut } from 'firebase/auth';
 import { useLocalSearchParams, router } from 'expo-router';
 import Item from './Item';
-import AddProduct from './addProduct'; // Import AddProduct component
 
-export default function admin() {
+export default function Home() {
   const { username } = useLocalSearchParams();
   const [data, setData] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredData, setFilteredData] = useState([]);
-  const [showAddProductModal, setShowAddProductModal] = useState(false); // State for showing/hiding Add Product modal
+  const animatedValue = new Animated.Value(0); // For animations and transitions
 
   useEffect(() => {
     const fetchData = async () => {
@@ -95,7 +94,7 @@ export default function admin() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {username && (
+      {/* {username && (
         <Pressable style={styles.signOutButton} onPress={handleSignOut}>
           <Text style={styles.signOutButtonText}>Sign Out</Text>
         </Pressable>
@@ -108,22 +107,16 @@ export default function admin() {
           value={searchTerm}
           onChangeText={(text) => setSearchTerm(text)}
         />
-      </View>
-      <Pressable style={styles.addButton} onPress={() => setShowAddProductModal(true)}>
-        <Text style={styles.buttonText}>Add Product</Text>
+      </View> */}
+      <Pressable style={styles.signOutButton} onPress={()=> router.push('/productadmin')}>
+          <Text style={styles.signOutButtonText}>Products</Text>
       </Pressable>
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={showAddProductModal}
-        onRequestClose={() => setShowAddProductModal(false)}
-      >
-        <View style={styles.modalContainer}>
-          <AddProduct />
-        </View>
-      </Modal>
-      <FlatList
+      <Pressable style={styles.signOutButton} onPress={()=> router.push('/users')}>
+          <Text style={styles.signOutButtonText}>Users</Text>
+      </Pressable>
+      {/* <FlatList
         data={filteredData}
+        keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <Animated.View style={styles.itemContainer}>
             <Item
@@ -133,11 +126,10 @@ export default function admin() {
             />
           </Animated.View>
         )}
-        keyExtractor={(item) => item.id}
         ListEmptyComponent={
           <Text style={styles.emptyText}>No products found</Text>
         }
-      />
+      /> */}
     </SafeAreaView>
   );
 }
@@ -150,12 +142,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#F0F0F0',
   },
   signOutButton: {
-    backgroundColor: '#FF6347',
-    padding: 12,
-    borderRadius: 10,
+    backgroundColor: '#FF6347', // A vibrant red for visibility
+    padding: 12, // Added padding for a more substantial button
+    borderRadius: 10, // Rounded corners for style
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 20,
+    marginBottom: 20, // Increased margin for spacing
   },
   signOutButtonText: {
     color: 'white',
@@ -164,57 +156,38 @@ const styles = StyleSheet.create({
   },
   userText: {
     fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: 'bold', // Added font weight for emphasis
+    color: '#333', // Darker text for contrast
     marginBottom: 20,
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 10,
-    padding: 15,
-    shadowColor: '#000',
+    backgroundColor: '#FFFFFF', // White background for clarity
+    borderRadius: 10, // Rounded corners for a soft appearance
+    padding: 15, // Generous padding for comfort
+    shadowColor: '#000', // Adding shadow for depth
     shadowOffset: {
       width: 0,
       height: 2,
     },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 3,
-    marginBottom: 20,
+    elevation: 3, // Required for shadows on Android
+    marginBottom: 20, // Spacing between the search bar and the list
   },
   searchInput: {
     flex: 1,
     fontSize: 16,
-    borderRadius: 10,
-    borderColor: '#D1D5DB',
+    borderRadius: 10, // Matching the outer container's corners
+    borderColor: '#D1D5DB', // Light gray border
     borderWidth: 1,
-    padding: 10,
+    padding: 10, // Comfortable padding for text input
     backgroundColor: 'white',
-  },
-  addButton: {
-    backgroundColor: '#007AFF',
-    paddingVertical: 12,
-    borderRadius: 5,
-    alignItems: 'center',
-    marginBottom: 15,
-  },
-  buttonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    width:'70%'
   },
   itemContainer: {
     backgroundColor: '#FFFFFF',
-    padding: 15,
+    padding: 15, // Increased padding for better alignment
     borderRadius: 10,
     shadowColor: '#000',
     shadowOffset: {
@@ -223,12 +196,12 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 3,
+    elevation: 3, // Required for shadows on Android
     marginBottom: 15,
   },
   emptyText: {
     textAlign: 'center',
     fontSize: 18,
-    color: '#666',
+    color: '#666', // A subtle gray for the empty text
   },
 });

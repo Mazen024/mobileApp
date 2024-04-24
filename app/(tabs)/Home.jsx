@@ -118,7 +118,6 @@
 // //     fontWeight: "bold",
 // //   },
 // // });
-
 import React, { useEffect, useState } from 'react';
 import {
   Text,
@@ -129,15 +128,21 @@ import {
   Pressable,
   TextInput,
   Animated,
+<<<<<<< HEAD
   Dimensions,
+=======
+>>>>>>> 3eccdd41ddfbb3ce1e524d722444f722e3d9ff01
 } from 'react-native';
 import { getDocs, collection, onSnapshot } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { useLocalSearchParams, router } from 'expo-router';
 import Item from '../Item';
 
+<<<<<<< HEAD
 const { width } = Dimensions.get('window');
 
+=======
+>>>>>>> 3eccdd41ddfbb3ce1e524d722444f722e3d9ff01
 export default function Home() {
   const [data, setData] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -187,6 +192,7 @@ export default function Home() {
       </View>
       <FlatList
         data={filteredData}
+<<<<<<< HEAD
         renderItem={({ item, index }) => (
           <Animated.View
             style={[
@@ -197,11 +203,17 @@ export default function Home() {
               },
             ]}
           >
+=======
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <Animated.View>
+>>>>>>> 3eccdd41ddfbb3ce1e524d722444f722e3d9ff01
             <Item
               name={item.name}
               price={item.price}
               image={item.image}
             />
+<<<<<<< HEAD
             <Pressable onPress={() => addToCart(item.id)}>
               <Text>Add to Cart</Text>
             </Pressable>
@@ -209,8 +221,12 @@ export default function Home() {
         )}
         keyExtractor={(item) => item.id}
         numColumns={2}
+=======
+          </Animated.View>
+        )}
+>>>>>>> 3eccdd41ddfbb3ce1e524d722444f722e3d9ff01
         ListEmptyComponent={
-          <Text style={styles.emptyText}>No products found</Text>
+          <Text>No products found</Text>
         }
       />
     </SafeAreaView>
@@ -220,35 +236,35 @@ export default function Home() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 40,
+    paddingTop: 40, 
     paddingHorizontal: 20,
-    backgroundColor: '#F0F0F0',
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#FFFFFF', 
     borderRadius: 10,
-    padding: 15,
-    shadowColor: '#000',
+    padding: 15, 
+    shadowColor: '#000', 
     shadowOffset: {
       width: 0,
       height: 2,
     },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 3,
+    elevation: 3, 
     marginBottom: 20,
   },
   searchInput: {
     flex: 1,
     fontSize: 16,
-    borderRadius: 10,
-    borderColor: '#D1D5DB',
+    borderRadius: 10, 
+    borderColor: '#D1D5DB', 
     borderWidth: 1,
-    padding: 10,
+    padding: 10, 
     backgroundColor: 'white',
   },
+<<<<<<< HEAD
   itemContainer: {
     width: (width - 60) / 2,
     backgroundColor: '#FFFFFF',
@@ -261,4 +277,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#666',
   },
+=======
+>>>>>>> 3eccdd41ddfbb3ce1e524d722444f722e3d9ff01
 });
