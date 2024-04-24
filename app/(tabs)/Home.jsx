@@ -200,24 +200,24 @@ export default function Home() {
       </View>
       <FlatList
         data={filteredData}
-        keyExtractor={(item) => item.id}
         renderItem={({ item, index }) => (
           <Animated.View
-            style={[
-              styles.itemContainer,
-              {
+          style={[
+            styles.itemContainer,
+            {
                 marginRight: index % 2 === 0 ? 10 : 0, // Add right margin for every odd index
                 marginLeft: index % 2 === 0 ? 0 : 10, // Add left margin for every even index
               },
             ]}
-          >
+            >
             <Item
               name={item.name}
               price={item.price}
               image={item.image}
-            />
+              />
           </Animated.View>
         )}
+        keyExtractor={(item) => item.id}
         numColumns={2} // Render two columns
         ListEmptyComponent={
           <Text style={styles.emptyText}>No products found</Text>
