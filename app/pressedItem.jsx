@@ -50,12 +50,11 @@ export default function PressedItem() {
 const styles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: '#F0F0F0',
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'flex-start',
       paddingHorizontal: 20,
-      paddingVertical: "15%",
+      paddingVertical: 20,
     },
     textContainer: {
       marginTop: '10%',

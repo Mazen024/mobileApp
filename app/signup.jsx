@@ -41,7 +41,7 @@ const SignUp = () => {
       };
       await addDoc(collection(db, "users"), userData);
 
-      router.replace(`/Home?userId=${userId}&username=${username}`);
+      router.push(`/Home?userId=${userId}&username=${username}`);
     } catch (error) {
       console.error("Error signing up:", error.message);
       setError(error.message);

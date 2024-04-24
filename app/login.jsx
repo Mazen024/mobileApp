@@ -55,7 +55,7 @@ const Login = () => {
       const user = auth.currentUser;
       const userId = user.uid;
       if (userId === "QE0qSKZoQwRmmLKgFVWSco8Jfu32") {
-        router.replace(`/admin?userId=${userId}&username=${username}`);
+        router.replace("/admin");
       } else {
         router.replace(`/Home?userId=${userId}&username=${username}`);
       }

@@ -118,7 +118,6 @@
 // //     fontWeight: "bold",
 // //   },
 // // });
-
 import React, { useEffect, useState } from 'react';
 import {
   Text,
@@ -129,7 +128,6 @@ import {
   Pressable,
   TextInput,
   Animated,
-  Dimensions, // Import Dimensions for screen width
 } from 'react-native';
 import { getDocs, collection } from 'firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -137,8 +135,6 @@ import { db } from '../../firebase';
 import { getAuth, signOut } from 'firebase/auth';
 import { useLocalSearchParams, router } from 'expo-router';
 import Item from '../Item';
-
-const { width } = Dimensions.get('window'); // Get screen width
 
 export default function Home() {
   const { username } = useLocalSearchParams();
@@ -200,27 +196,18 @@ export default function Home() {
       </View>
       <FlatList
         data={filteredData}
-        renderItem={({ item, index }) => (
-          <Animated.View
-          style={[
-            styles.itemContainer,
-            {
-                marginRight: index % 2 === 0 ? 10 : 0, // Add right margin for every odd index
-                marginLeft: index % 2 === 0 ? 0 : 10, // Add left margin for every even index
-              },
-            ]}
-            >
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <Animated.View>
             <Item
               name={item.name}
               price={item.price}
               image={item.image}
-              />
+            />
           </Animated.View>
         )}
-        keyExtractor={(item) => item.id}
-        numColumns={2} // Render two columns
         ListEmptyComponent={
-          <Text style={styles.emptyText}>No products found</Text>
+          <Text>No products found</Text>
         }
       />
     </SafeAreaView>
@@ -230,53 +217,32 @@ export default function Home() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 40,
+    paddingTop: 40, 
     paddingHorizontal: 20,
-    backgroundColor: '#F0F0F0',
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#FFFFFF', 
     borderRadius: 10,
-    padding: 15,
-    shadowColor: '#000',
+    padding: 15, 
+    shadowColor: '#000', 
     shadowOffset: {
       width: 0,
       height: 2,
     },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 3,
+    elevation: 3, 
     marginBottom: 20,
   },
   searchInput: {
     flex: 1,
     fontSize: 16,
-    borderRadius: 10,
-    borderColor: '#D1D5DB',
+    borderRadius: 10, 
+    borderColor: '#D1D5DB', 
     borderWidth: 1,
-    padding: 10,
+    padding: 10, 
     backgroundColor: 'white',
-  },
-  itemContainer: {
-    width: (width - 60) / 2, // Calculate width based on screen width and margins
-    backgroundColor: '#FFFFFF',
-    padding: 10,
-    borderRadius: 10,
-    // shadowColor: '#000',
-    // shadowOffset: {
-    //   width: 0,
-    //   height: 2,
-    // },
-    // shadowOpacity: 0.1,
-    // shadowRadius: 4,
-    // elevation: 3,
-    marginBottom: 15,
-  },
-  emptyText: {
-    textAlign: 'center',
-    fontSize: 18,
-    color: '#666',
   },
 });

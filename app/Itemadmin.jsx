@@ -191,12 +191,6 @@ export default function Item({ name, price, image }) {
         <Text style={styles.productTitle}>{name}</Text>
         <Text style={styles.productPrice}>${price}</Text>
         <View style={styles.productActions}>
-          <Pressable onPress={addToFavorites}>
-            <AntDesign name="hearto" size={24} color="black" />
-          </Pressable>
-          <Pressable onPress={addToCart}>
-            <AntDesign name="shoppingcart" size={24} color="black" />
-          </Pressable>
         </View>
         <View style={styles.productRating}>
           <Text style={styles.ratingText}>{rating}</Text>
@@ -212,7 +206,7 @@ const styles = StyleSheet.create({
   item1 : { 
     marginVertical: 14,
     // width: itemWidth,
-    width : '48%' ,
+    width : '100%' ,
   },
   item: {
     backgroundColor: '#fff',
