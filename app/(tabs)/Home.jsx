@@ -118,6 +118,9 @@
 // //     fontWeight: "bold",
 // //   },
 // // });
+
+
+
 import React, { useEffect, useState } from 'react';
 import {
   Text,
@@ -128,26 +131,36 @@ import {
   Pressable,
   TextInput,
   Animated,
-<<<<<<< HEAD
   Dimensions,
-=======
->>>>>>> 3eccdd41ddfbb3ce1e524d722444f722e3d9ff01
 } from 'react-native';
-import { getDocs, collection, onSnapshot } from 'firebase/firestore';
+import { addDoc, getDocs, collection, onSnapshot } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { useLocalSearchParams, router } from 'expo-router';
 import Item from '../Item';
+import { getAuth, onAuthStateChanged } from 'firebase/auth'; // Import onAuthStateChanged
 
-<<<<<<< HEAD
 const { width } = Dimensions.get('window');
 
-=======
->>>>>>> 3eccdd41ddfbb3ce1e524d722444f722e3d9ff01
 export default function Home() {
   const [data, setData] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredData, setFilteredData] = useState([]);
   const animatedValue = new Animated.Value(0);
+  const [userId, setUserId] = useState(null);
+  const [addedToCart, setAddedToCart] = useState({});
+
+
+  useEffect(() => {
+    const unsubscribeAuth = onAuthStateChanged(getAuth(), (user) => {
+      if (user) {
+        setUserId(user.uid); // Set userId if user is authenticated
+      } else {
+        setUserId(null); // Reset userId if user is not authenticated
+      }
+    });
+
+    return () => unsubscribeAuth();
+  }, []);
 
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, 'Products'), (snapshot) => {
@@ -163,23 +176,43 @@ export default function Home() {
     const filterResults = data.filter((item) =>
       item.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
-
+  
     setFilteredData(filterResults);
   }, [searchTerm, data]);
 
-  const addToCart = async (itemId) => {
+  const addToCart = async (productName) => {
     try {
-      await addDoc(collection(db, 'Cart'), {
-        userId: userId,
-        itemId: itemId,
-        quantity: 1,
-      });
-      console.log('Item added to cart');
+      if (addedToCart[productName]) {
+        return;
+      }
+  
+      if (!userId) {
+        alert('Please sign in to add items to your cart');
+        return;
+      }
+  
+      const productSnapshot = await getDocs(collection(db, 'Products'));
+      const matchingProduct = productSnapshot.docs.find((doc) => doc.data().name === productName);
+  
+      if (matchingProduct) {
+        const productId = matchingProduct.id;
+        await addDoc(collection(db, 'Cart'), {
+          userId: userId,
+          productId: productId,
+          quantity: 1,
+        });
+        setAddedToCart(prevState => ({
+          ...prevState,
+          [productName]: true,
+        }));
+      } else {
+        console.log('Product not found');
+      }
     } catch (error) {
       console.error('Error adding item to cart:', error);
     }
   };
-
+  
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.searchContainer}>
@@ -192,7 +225,6 @@ export default function Home() {
       </View>
       <FlatList
         data={filteredData}
-<<<<<<< HEAD
         renderItem={({ item, index }) => (
           <Animated.View
             style={[
@@ -203,30 +235,29 @@ export default function Home() {
               },
             ]}
           >
-=======
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <Animated.View>
->>>>>>> 3eccdd41ddfbb3ce1e524d722444f722e3d9ff01
             <Item
               name={item.name}
               price={item.price}
               image={item.image}
             />
-<<<<<<< HEAD
-            <Pressable onPress={() => addToCart(item.id)}>
-              <Text>Add to Cart</Text>
+            <Pressable
+              style={[
+                styles.AddCartButton,
+                addedToCart[item.name] ? styles.AddedToCartButton : null,
+              ]}
+              onPress={() => addToCart(item.name)}
+              disabled={addedToCart[item.name]}
+            >
+              <Text style={styles.AddCart}>
+                {addedToCart[item.name] ? 'Added to Cart' : 'Add to Cart'}
+              </Text>
             </Pressable>
           </Animated.View>
         )}
         keyExtractor={(item) => item.id}
         numColumns={2}
-=======
-          </Animated.View>
-        )}
->>>>>>> 3eccdd41ddfbb3ce1e524d722444f722e3d9ff01
         ListEmptyComponent={
-          <Text>No products found</Text>
+          <Text style={styles.emptyText}>No products found</Text>
         }
       />
     </SafeAreaView>
@@ -236,35 +267,66 @@ export default function Home() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 40, 
+    paddingTop: 40,
     paddingHorizontal: 20,
+    backgroundColor: '#F0F0F0',
+  },
+  AddCartButton: {
+    backgroundColor: 'blue',
+    padding: 5,
+    borderRadius: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 10,
+    width: '70%',
+  },
+  AddCart: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 18,
+  },
+  AddedToCartButton: {
+    backgroundColor: 'green', // Change color to green when added to cart
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF', 
+    backgroundColor: '#FFFFFF',
     borderRadius: 10,
-    padding: 15, 
-    shadowColor: '#000', 
+    padding: 15,
+    shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 2,
     },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 3, 
+    elevation: 3,
     marginBottom: 20,
+  },
+  AddCartButton: {
+    backgroundColor: 'blue',
+    padding: 5,
+    borderRadius: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 10,
+    width: '70%',
+  },
+  AddCart: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 18,
   },
   searchInput: {
     flex: 1,
     fontSize: 16,
-    borderRadius: 10, 
-    borderColor: '#D1D5DB', 
+    borderRadius: 10,
+    borderColor: '#D1D5DB',
     borderWidth: 1,
-    padding: 10, 
+    padding: 10,
     backgroundColor: 'white',
   },
-<<<<<<< HEAD
   itemContainer: {
     width: (width - 60) / 2,
     backgroundColor: '#FFFFFF',
@@ -277,6 +339,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#666',
   },
-=======
->>>>>>> 3eccdd41ddfbb3ce1e524d722444f722e3d9ff01
+  AddedToCartButton: {
+    backgroundColor: 'red',
+  },  
 });
