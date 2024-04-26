@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Text, View, StyleSheet, SafeAreaView, FlatList, Pressable, Modal, TextInput } from 'react-native';
 import { getDocs, collection, onSnapshot, deleteDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
-import { getAuth, signOut } from 'firebase/auth';
 import AddUser from './addUsers';
 import { Ionicons } from '@expo/vector-icons';
 

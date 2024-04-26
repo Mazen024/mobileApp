@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, Pressable } from 'react-native';
 import { updateDoc, doc, query, collection, getDocs, where } from 'firebase/firestore';
 import { db } from '../../firebase';
-import { Ionicons } from '@expo/vector-icons'; // Import Ionicons from @expo/vector-icons for delete icon
+import { Ionicons } from '@expo/vector-icons'; 
 
 const EditProduct = ({ product, onClose }) => {
   const [name, setName] = useState(product.name);
@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
   },
   updateButton: {
     backgroundColor: '#007AFF',
-    flexDirection: 'row', // Align icon and text horizontally
+    flexDirection: 'row', 
     paddingVertical: 12,
     borderRadius: 5,
     alignItems: 'center',
@@ -103,10 +103,10 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
-    marginRight: 10, // Add space between text and icon
+    marginRight: 10, 
   },
   icon: {
-    marginLeft: 10, // Add space between text and icon
+    marginLeft: 10, 
   },
 });
 
