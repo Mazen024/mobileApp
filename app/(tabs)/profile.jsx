@@ -91,18 +91,22 @@
 //   },
 // });
 
+
 import EditScreenInfo from '@/components/EditScreenInfo';
-import { Text, View } from '@/components/Themed';
-import { Pressable, StyleSheet , Image } from 'react-native';
+// import { Text, View } from '@/components/Themed';
+
 import React, { useEffect, useState } from 'react';
-import { collection, query, where, getDocs } from 'firebase/firestore';
-import { db } from '../../firebase';
+import { View, Text, Pressable, StyleSheet, Image } from 'react-native';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { collection, query, where, getDocs, updateDoc, doc } from 'firebase/firestore';
+import { db } from '../../firebase';
 import { router } from 'expo-router';
-import logo from '../../assets/images/pngwing.com.png';
+import * as ImagePicker from 'expo-image-picker';
+import { Ionicons } from '@expo/vector-icons'; // Import Ionicons for camera icon
 
 const Profile = () => {
   const [user, setUser] = useState(null);
+  const [profileImage, setProfileImage] = useState(null);
 
   useEffect(() => {
     const auth = getAuth();
@@ -116,6 +120,10 @@ const Profile = () => {
           if (!querySnapshot.empty) {
             const userData = querySnapshot.docs[0].data();
             setUser(userData);
+            // Set the profile image if it exists in the user data
+            if (userData.image) {
+              setProfileImage(userData.image);
+            }
           } else {
             console.log('User not found');
           }
@@ -124,20 +132,71 @@ const Profile = () => {
         }
       } else {
         setUser(null);
+        setProfileImage(null);
       }
     });
-
+  
     return () => unsubscribe();
   }, []);
+  
+
+  const handleImageUpload = async () => {
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (permissionResult.granted === false) {
+      alert('Permission to access camera roll is required!');
+      return;
+    }
+
+    const imageResult = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+
+    if (!imageResult.canceled && imageResult.assets[0].uri) {
+      try {
+        const querySnapshot = await getDocs(
+          query(collection(db, 'users'), where('name', '==', user.name))
+        );
+        if (querySnapshot.empty) {
+          alert('User not found.');
+          return;
+        }
+
+        const docRef = querySnapshot.docs[0].ref;
+
+        await updateDoc(docRef, {
+          image: imageResult.assets[0].uri,
+        });
+
+        setProfileImage(imageResult.assets[0].uri);
+      } catch (error) {
+        console.error('Error updating user document:', error);
+      }
+    } else {
+      console.log('Image selection canceled or URI not present:', imageResult);
+    }
+  };
 
   return (
     <View style={styles.container}>
       {user ? (
         <View style={styles.userInfo}>
-          <Image source= {logo} resizeMode="contain" style={styles.logo} />
-          <Text style={styles.text}>Username: {user.name}</Text>
-          <Text style={styles.text}>Email: {user.email}</Text>
-          <Pressable style={styles.signOutButton} onPress={() => router.push('login')}>
+          <View style={styles.imageContainer}>
+            <Image
+              source={profileImage ? { uri: profileImage } : require('../../assets/images/th.jpg')}
+              style={styles.profileImage}
+            />
+            <Pressable onPress={handleImageUpload} style={styles.cameraIcon}>
+              <Ionicons name="camera" size={24} color="white" />
+            </Pressable>
+          </View>
+          <View style={styles.infoContainer}>
+            <Text style={styles.username}>Name:{user.name}</Text>
+            <Text style={styles.email}>Email:{user.email}</Text>
+          </View>
+          <Pressable style={styles.signOutButton} onPress={() => router.replace('login')}>
             <Text style={styles.signOutButtonText}>Sign Out</Text>
           </Pressable>
         </View>
@@ -153,42 +212,55 @@ const Profile = () => {
   );
 };
 
-export default Profile;
-
 const styles = StyleSheet.create({
-  logo: {
-    marginTop : 30 ,
-    marginBottom : 90,
-    marginleft :9 ,
-    width: '50%', 
-    height: '30%',
-    alignItems: 'left',
-  },
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F3F4F6', // Light gray with a slight blue tone
-    padding: 20,
+    backgroundColor: '#F3F4F6',
+    padding: 40,
   },
   userInfo: {
     alignItems: 'center',
-    borderRadius: 10, // Rounded corners for a softer look
-    backgroundColor: '#FFFFFF', // White background for the info section
-    padding: 20, // Extra padding for a more substantial feel
+    borderRadius: 10,
+    backgroundColor: '#FFFFFF',
+    padding: 20,
   },
-  text: {
-    fontSize: 22, // Slightly larger for better readability
-    color: '#1F2937', // Dark gray for a modern look
-    marginBottom: 15, // Increased spacing
+  imageContainer: {
+    position: 'relative',
+    marginBottom: 20,
+  },
+  profileImage: {
+    width: 120,
+    height: 120,
+    borderRadius: 75,
+  },
+  cameraIcon: {
+    position: 'absolute',
+    bottom: -1,
+    right: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    borderRadius: 20,
+    padding: 2,
+  },
+  infoContainer: {
+    marginBottom: 20,
+    height:"70%"
+  },
+  username: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 20,
+  },
+  email: {
+    fontSize: 18,
+    color: '#333',
+    marginBottom: 20,
   },
   signOutButton: {
-    backgroundColor: '#EF4444', // Red for sign-out to indicate caution
+    backgroundColor: '#EF4444',
     paddingVertical: 12,
     paddingHorizontal: 30,
-    borderRadius: 8, // Larger radius for smoother corners
-    alignItems: 'center',
-    justifyContent: 'center',
+    borderRadius: 8,
   },
   signOutButtonText: {
     color: 'white',
@@ -197,17 +269,17 @@ const styles = StyleSheet.create({
   },
   signInPrompt: {
     alignItems: 'center',
-    backgroundColor: '#FFFFFF', // Consistent with userInfo background
+    backgroundColor: '#FFFFFF',
     borderRadius: 10,
     padding: 20,
   },
   promptText: {
     fontSize: 20,
-    color: '#1F2937', // Consistent dark gray
+    color: '#1F2937',
     marginBottom: 15,
   },
   signInButton: {
-    backgroundColor: '#3B82F6', // Bright blue for sign-in
+    backgroundColor: '#3B82F6',
     paddingVertical: 12,
     paddingHorizontal: 30,
     borderRadius: 8,
@@ -220,3 +292,5 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
+
+export default Profile;
