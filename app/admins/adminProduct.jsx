@@ -32,54 +32,44 @@ import {
   Pressable,
   TextInput,
   Animated,
-  Modal, // Import Modal component
+  Modal,
+  Image,
 } from 'react-native';
-import { getDocs, collection, onSnapshot } from 'firebase/firestore';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { db } from '../firebase';
+import { getDocs, collection, onSnapshot, query, where, deleteDoc } from 'firebase/firestore';
+import { db } from '../../firebase';
 import { getAuth, signOut } from 'firebase/auth';
 import { useLocalSearchParams, router } from 'expo-router';
-import Item from './Item';
-import AddProduct from './AddProduct';
+import Item from '../Item';
+import AddProduct from './addProduct';
+import EditProduct from './editProduct';
+import deleteIcon from '../../assets/images/delete-vector-icon.jpg'
+import { Ionicons } from '@expo/vector-icons';
 
-export default function admin() {
+export default function adminProduct() {
   const { username } = useLocalSearchParams();
   const [data, setData] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredData, setFilteredData] = useState([]);
-  const [showAddProductModal, setShowAddProductModal] = useState(false); // State for showing/hiding Add Product modal
+  const [showAddProductModal, setShowAddProductModal] = useState(false);
+  const [showEditProductModal, setShowEditProductModal] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const querySnapshot = await getDocs(collection(db, 'Products'));
-        const fetchedData = querySnapshot.docs.map((doc) => doc.data());
-        
-        setData(fetchedData);
-        setFilteredData(fetchedData);
-  
-        const unsubscribe = onSnapshot(collection(db, 'Products'), (snapshot) => {
-          const updatedData = snapshot.docs.map((doc) => doc.data());
-          setData(updatedData);
-          setFilteredData(updatedData);
-        });
-  
-        // Cleanup function to unsubscribe from snapshot listener
-        return () => unsubscribe();
-      } catch (error) {
-        console.error('Error fetching data: ', error);
-      }
-    };
-  
-    fetchData();
+    const unsubscribe = onSnapshot(collection(db, 'Products'), (snapshot) => {
+      const updatedData = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setData(updatedData);
+    });
+
+    return () => unsubscribe();
   }, []);
-  
-  
+
   useEffect(() => {
     const filterResults = data.filter((item) =>
       item.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
-
     setFilteredData(filterResults);
   }, [searchTerm, data]);
 
@@ -93,6 +83,24 @@ export default function admin() {
     }
   };
 
+  const handleDelete = async (productName) => {
+    try {
+      const querySnapshot = await getDocs(
+        query(collection(db, 'Products'), where('name', '==', productName))
+      );
+      querySnapshot.forEach(async (doc) => {
+        await deleteDoc(doc.ref);
+      });
+    } catch (error) {
+      console.error('Error deleting product:', error);
+    }
+  };
+
+  const handleEditProduct = (product) => {
+    setSelectedProduct(product);
+    setShowEditProductModal(true);
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       {username && (
@@ -100,7 +108,6 @@ export default function admin() {
           <Text style={styles.signOutButtonText}>Sign Out</Text>
         </Pressable>
       )}
-      <Text style={styles.userText}>{username ? `Welcome, ${username}` : 'Welcome, Guest'}</Text>
       <View style={styles.searchContainer}>
         <TextInput
           style={styles.searchInput}
@@ -122,15 +129,36 @@ export default function admin() {
           <AddProduct />
         </View>
       </Modal>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={showEditProductModal}
+        onRequestClose={() => setShowEditProductModal(false)}
+      >
+        <View style={styles.modalContainer}>
+          <EditProduct product={selectedProduct} onClose={() => setShowEditProductModal(false)} />
+        </View>
+      </Modal>
       <FlatList
         data={filteredData}
         renderItem={({ item }) => (
           <Animated.View style={styles.itemContainer}>
-            <Item
-              name={item.name}
-              price={item.price}
-              image={item.image}
-            />
+            <View style={styles.productInfo}>
+              <Item
+                name={item.name}
+                price={item.price}
+                image={item.imageUrl}
+              />
+            </View>
+            <View>
+              <Pressable onPress={() => handleDelete(item.name)} style={styles.deleteButton}>
+                <Image source={deleteIcon} style={styles.deleteIcon} />
+              </Pressable>
+              <Pressable onPress={() => handleEditProduct(item)} style={styles.updateButton}>
+                <Text style={styles.updateText}>Update..</Text>
+                <Ionicons name="arrow-forward-outline" size={24} color="white" style={styles.icon} />
+              </Pressable>
+            </View>
           </Animated.View>
         )}
         keyExtractor={(item) => item.id}
@@ -161,12 +189,6 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
     fontSize: 18,
-  },
-  userText: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 20,
   },
   searchContainer: {
     flexDirection: 'row',
@@ -210,9 +232,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    width:'70%'
+    width: '70%'
   },
   itemContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     backgroundColor: '#FFFFFF',
     padding: 15,
     borderRadius: 10,
@@ -225,6 +250,35 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
     marginBottom: 15,
+  },
+  productInfo: {
+    flex: 1,
+  },
+  deleteButton: {
+    padding: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  deleteIcon: {
+    width: 30,
+    height: 30,
+  },
+  updateButton: {
+    padding: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  updateText: {
+    color: 'black',
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderRadius: 4,
+    fontFamily: 'bold',
+    textDecorationLine: "underline", 
+    fontWeight:'900',
+    fontSize: 14,
   },
   emptyText: {
     textAlign: 'center',

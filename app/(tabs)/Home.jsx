@@ -238,7 +238,7 @@ export default function Home() {
             <Item
               name={item.name}
               price={item.price}
-              image={item.image}
+              image={item.imageUrl}
             />
             <Pressable
               style={[

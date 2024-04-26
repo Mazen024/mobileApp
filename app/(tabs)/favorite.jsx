@@ -104,10 +104,10 @@ function CartItem({ productId, quantity, onDelete }) {
       <Text style={styles.productName}>{product.name}</Text>
       <Text style={styles.price}>Price: ${product.price}</Text>
       <Text style={styles.quantity}>Quantity: {quantity}</Text>
+      <Image source={{ uri: product.imageUrl }} style={styles.image} />
       <TouchableOpacity onPress={onDelete} style={styles.deleteButton}>
         <Text style={styles.deleteButtonText}>Delete</Text>
       </TouchableOpacity>
-      <Image source={{ uri: product.image }} style={styles.image} />
     </View>
   );
 }
