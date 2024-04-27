@@ -16,7 +16,7 @@ const Home = () => {
     try {
       const auth = getAuth();
       await signOut(auth);
-      router.replace('/login'); // Assuming there's a login route to redirect after sign-out
+      router.replace('/login');
     } catch (error) {
       console.error('Error signing out:', error);
     }

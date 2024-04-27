@@ -1,12 +1,9 @@
 import { View, Text, ImageBackground, StyleSheet, TouchableOpacity, Image, Pressable } from 'react-native';
 import React from 'react';
-import { Link, useRouter } from 'expo-router';
-import Button from '../components/Button';
+import { useRouter } from 'expo-router';
 import logo from '../assets/images/pngwing.com.png';
 import back from '../assets/images/back.jpeg';
 import COLORS from '../constants/Colors'
-
-
 
 const Welcome = () => {
   const router = useRouter();
@@ -21,11 +18,6 @@ const Welcome = () => {
             style={styles.btn} > 
             <Text style = {styles.bodyText}>Login</Text>
           </Pressable>
-          {/* <Button
-            title="Login"
-            onPress={() => router.push('/login')}
-            style={styles.btn}
-          /> */}
         </View>
         <View style={styles.bottomContainer}>
           <Text style={{ marginTop: 72 }}></Text>
@@ -52,8 +44,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   logo: {
-    width: 300, // Fixed width value
-    height: 300, // Fixed height value
+    width: 300, 
+    height: 300, 
   },
   title: {
     width: 350 ,

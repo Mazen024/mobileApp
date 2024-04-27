@@ -1,3 +1,5 @@
+<<<<<<< HEAD
+=======
 // import EditScreenInfo from '@/components/EditScreenInfo';
 // import { Text, View } from '@/components/Themed';
 // import { Pressable, StyleSheet } from "react-native";
@@ -95,6 +97,7 @@
 import EditScreenInfo from '@/components/EditScreenInfo';
 // import { Text, View } from '@/components/Themed';
 
+>>>>>>> 63e8c650a1b48459ed0f8bced2cbe29d689efa6e
 import React, { useEffect, useState } from 'react';
 import { View, Text, Pressable, StyleSheet, Image } from 'react-native';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
@@ -102,7 +105,11 @@ import { collection, query, where, getDocs, updateDoc, doc } from 'firebase/fire
 import { db } from '../../firebase';
 import { router } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
+<<<<<<< HEAD
+import { Ionicons } from '@expo/vector-icons'; 
+=======
 import { Ionicons } from '@expo/vector-icons'; // Import Ionicons for camera icon
+>>>>>>> 63e8c650a1b48459ed0f8bced2cbe29d689efa6e
 
 const Profile = () => {
   const [user, setUser] = useState(null);
@@ -293,4 +300,8 @@ const styles = StyleSheet.create({
   },
 });
 
+<<<<<<< HEAD
 export default Profile;
+=======
+export default Profile;
+>>>>>>> 63e8c650a1b48459ed0f8bced2cbe29d689efa6e

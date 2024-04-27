@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { StyleSheet, View, TextInput, Pressable, Text } from "react-native";
-import { Link, router } from "expo-router";
+import { Link } from "expo-router";
 import { getAuth, sendPasswordResetEmail } from "firebase/auth";
 
 const ForgotPassword = () => {

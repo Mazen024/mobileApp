@@ -1,17 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, FlatList, Image, TouchableOpacity } from 'react-native';
-import { db } from '../../firebase';
-import { doc, getDoc, collection, query, where, onSnapshot, deleteDoc } from 'firebase/firestore';
+import { db } from '../firebase';
+import { doc, getDoc, getDocs, collection, query, where, onSnapshot, deleteDoc } from 'firebase/firestore';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
-export default function favorite() {
-  const [favoriteItems, setFavoriteItems] = useState([]);
+export default function Cart() {
+  const [cartItems, setCartItems] = useState([]);
   const [userId, setUserId] = useState(null);
 
   useEffect(() => {
     const auth = getAuth();
     const unsubscribe = onAuthStateChanged(auth, async (authenticatedUser) => {
-      setUserId(authenticatedUser ? authenticatedUser.uid : null);
+      if (authenticatedUser) {
+        const userId = authenticatedUser.uid;
+        setUserId(userId);
+      } else {
+        setUserId(null);
+      }
     });
 
     return () => unsubscribe();
@@ -19,54 +24,60 @@ export default function favorite() {
 
   useEffect(() => {
     if (userId) {
-      const q = query(collection(db, 'Favorites'), where('userId', '==', userId));
+      const q = query(collection(db, 'Cart'), where('userId', '==', userId));
       const unsubscribe = onSnapshot(q, (snapshot) => {
-        const items = snapshot.docs.map((doc) => ({
-          productId: doc.data().productId,
-        }));
-        setFavoriteItems(items);
+        const items = [];
+        snapshot.forEach((doc) => {
+          const data = doc.data();
+          items.push({
+            productId: data.productId,
+            quantity: data.quantity,
+          });
+        });
+        setCartItems(items);
       });
 
       return () => unsubscribe();
     }
   }, [userId]);
 
-  const removeFavorite = async (productId) => {
+  const deleteCartItem = async (productId) => {
     try {
-      const q = query(collection(db, 'Favorites'), where('productId', '==', productId), where('userId', '==', userId));
-      const snapshot = await getDocs(q);
-      snapshot.forEach(async (doc) => {
+      const cartQuery = query(collection(db, 'Cart'), where('productId', '==', productId));
+      const cartSnapshot = await getDocs(cartQuery);  
+      cartSnapshot.forEach(async (doc) => {
         await deleteDoc(doc.ref);
       });
     } catch (error) {
-      console.error("Error removing favorite:", error);
+      console.error('Error deleting item:', error);
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Favorites</Text>
+      <Text style={styles.text}>Cart</Text>
       <FlatList
-        data={favoriteItems}
+        data={cartItems}
         renderItem={({ item }) => (
-          <FavoriteItem
+          <CartItem
             key={item.productId}
             productId={item.productId}
-            onRemove={() => removeFavorite(item.productId)}
+            quantity={item.quantity}
+            onDelete={() => deleteCartItem(item.productId)}
           />
         )}
         keyExtractor={(item) => item.productId}
-        ListEmptyComponent={<Text>Your favorites list is empty</Text>}
+        ListEmptyComponent={<Text>Your cart is empty</Text>}
       />
     </View>
   );
 }
 
-function FavoriteItem({ productId, onRemove }) {
+function CartItem({ productId, quantity, onDelete }) {
   const [product, setProduct] = useState(null);
 
   useEffect(() => {
-    const fetchProduct = async () => {
+    const getProduct = async () => {
       try {
         const productRef = doc(db, 'Products', productId);
         const productSnap = await getDoc(productRef);
@@ -81,7 +92,7 @@ function FavoriteItem({ productId, onRemove }) {
       }
     };
 
-    fetchProduct();
+    getProduct();
   }, [productId]);
 
   if (!product) {
@@ -89,12 +100,13 @@ function FavoriteItem({ productId, onRemove }) {
   }
 
   return (
-    <View style={styles.favoriteItem}>
+    <View style={styles.cartItem}>
       <Text style={styles.productName}>{product.name}</Text>
       <Text style={styles.price}>Price: ${product.price}</Text>
+      <Text style={styles.quantity}>Quantity: {quantity}</Text>
       <Image source={{ uri: product.imageUrl }} style={styles.image} />
-      <TouchableOpacity onPress={onRemove} style={styles.removeButton}>
-        <Text style={styles.removeButtonText}>Remove</Text>
+      <TouchableOpacity onPress={onDelete} style={styles.deleteButton}>
+        <Text style={styles.deleteButtonText}>Delete</Text>
       </TouchableOpacity>
     </View>
   );
@@ -110,7 +122,7 @@ const styles = StyleSheet.create({
     fontSize: 32,
     marginBottom: 10,
   },
-  favoriteItem: {
+  cartItem: {
     backgroundColor: 'white',
     borderRadius: 10,
     padding: 10,
@@ -134,21 +146,26 @@ const styles = StyleSheet.create({
     color: '#888',
     marginBottom: 5,
   },
+  quantity: {
+    fontSize: 16,
+    color: '#555',
+    marginBottom: 5,
+  },
   image: {
     width: '50%',
     height: 200,
-    left: 10,
+    left:10,
     borderRadius: 10,
     marginTop: 10,
   },
-  removeButton: {
+  deleteButton: {
     backgroundColor: 'red',
     borderRadius: 5,
     paddingVertical: 5,
     paddingHorizontal: 10,
     marginTop: 5,
   },
-  removeButtonText: {
+  deleteButtonText: {
     color: 'white',
     fontWeight: 'bold',
   },

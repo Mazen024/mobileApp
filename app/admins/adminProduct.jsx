@@ -1,40 +1,5 @@
-// useEffect(() => {
-//   const fetchData = async () => {
-//     try {
-//       const storedData = await AsyncStorage.getItem('productData');
-//       const parsedData = storedData ? JSON.parse(storedData) : [];
-
-//       const querySnapshot = await getDocs(collection(db, 'Products'));
-//       const fetchedData = querySnapshot.docs.map((doc) => doc.data());
-
-//       if (parsedData.length !== fetchedData.length) {
-//         await AsyncStorage.setItem('productData', JSON.stringify(fetchedData));
-//       }
-
-//       setData(fetchedData);
-//       setFilteredData(fetchedData);
-//     } catch (error) {
-//       console.error('Error fetching data: ', error);
-//     }
-//   };
-
-//   fetchData();
-// }, []);
-
-
 import React, { useEffect, useState } from 'react';
-import {
-  Text,
-  View,
-  StyleSheet,
-  SafeAreaView,
-  FlatList,
-  Pressable,
-  TextInput,
-  Animated,
-  Modal,
-  Image,
-} from 'react-native';
+import {Text,View,StyleSheet,SafeAreaView,FlatList,Pressable,TextInput,Animated,Modal,Image,} from 'react-native';
 import { getDocs, collection, onSnapshot, query, where, deleteDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { getAuth, signOut } from 'firebase/auth';

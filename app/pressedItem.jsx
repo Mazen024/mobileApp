@@ -34,7 +34,6 @@ export default function PressedItem() {
           <>
             <Text style={styles.name}>{itemData.name}</Text>
             <Text style={styles.price}>${itemData.price}</Text>
-            {/* Render other fields here */}
           </>
         ) : (
           <Text>Loading...</Text>
