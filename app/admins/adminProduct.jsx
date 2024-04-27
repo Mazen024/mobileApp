@@ -275,7 +275,7 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     paddingHorizontal: 8,
     borderRadius: 4,
-    fontFamily: 'bold',
+    fontWeight: 'bold',
     textDecorationLine: "underline", 
     fontWeight:'900',
     fontSize: 14,

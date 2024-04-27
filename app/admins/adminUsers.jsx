@@ -8,6 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 export default function adminUsers() {
   const [users, setUsers] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
   const [showAddUserModal, setShowAddUserModal] = useState(false);
   const [showEditUserModal, setShowEditUserModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -24,6 +25,13 @@ export default function adminUsers() {
 
     return () => unsubscribe();
   }, []);
+
+  useEffect(() => {
+    const filterResults = users.filter((item) =>
+      item.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilteredData(filterResults);
+  }, [searchTerm, users]);
 
   const handleDeleteUser = async (userEmail) => {
     try {
@@ -100,7 +108,7 @@ export default function adminUsers() {
         </View>
       </Modal>
       <FlatList
-        data={users}
+        data={filteredData}
         renderItem={({ item }) => (
           <View style={styles.itemContainer}>
             <Text>{item.name}</Text>
