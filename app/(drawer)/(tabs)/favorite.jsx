@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, FlatList, Image, TouchableOpacity } from 'react-native';
-import { db } from '../../firebase';
-import { doc, getDoc, collection, query, where, onSnapshot, deleteDoc } from 'firebase/firestore';
+import { db } from '../../../firebase';
+import { doc, getDoc, collection, query, where, onSnapshot, deleteDoc , getDocs} from 'firebase/firestore';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
 export default function favorite() {
@@ -33,15 +33,19 @@ export default function favorite() {
 
   const removeFavorite = async (productId) => {
     try {
-      const q = query(collection(db, 'Favorites'), where('productId', '==', productId), where('userId', '==', userId));
-      const snapshot = await getDocs(q);
-      snapshot.forEach(async (doc) => {
+      const q = query(
+        collection(db, 'Favorites'),
+        where('productId', '==', productId),
+        where('userId', '==', userId)
+      );
+        const snapshot = await getDocs(q);
+        for (const doc of snapshot.docs) {
         await deleteDoc(doc.ref);
-      });
+      }
     } catch (error) {
-      console.error("Error removing favorite:", error);
+      console.error('Error removing favorite:', error);
     }
-  };
+  };  
 
   return (
     <View style={styles.container}>

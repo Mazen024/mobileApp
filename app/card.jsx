@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, FlatList, Image, TouchableOpacity } from 'react-native';
-import { db } from '../firebase';
-import { doc, getDoc, getDocs, collection, query, where, onSnapshot, deleteDoc } from 'firebase/firestore';
+import { db } from '../firebase'; 
+import { collection, query, where, onSnapshot, deleteDoc, getDocs, getDoc, doc } from 'firebase/firestore';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
 export default function Cart() {
@@ -10,63 +10,59 @@ export default function Cart() {
 
   useEffect(() => {
     const auth = getAuth();
-    const unsubscribe = onAuthStateChanged(auth, async (authenticatedUser) => {
-      if (authenticatedUser) {
-        const userId = authenticatedUser.uid;
-        setUserId(userId);
-      } else {
-        setUserId(null);
-      }
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUserId(user ? user.uid : null);
     });
-
     return () => unsubscribe();
   }, []);
 
   useEffect(() => {
     if (userId) {
-      const q = query(collection(db, 'Cart'), where('userId', '==', userId));
-      const unsubscribe = onSnapshot(q, (snapshot) => {
-        const items = [];
-        snapshot.forEach((doc) => {
+      const cartQuery = query(collection(db, 'Cart'), where('userId', '==', userId));
+      const unsubscribe = onSnapshot(cartQuery, (snapshot) => {
+        const cartData = snapshot.docs.map((doc) => {
           const data = doc.data();
-          items.push({
+          return {
+            id: doc.id,
             productId: data.productId,
             quantity: data.quantity,
-          });
+          };
         });
-        setCartItems(items);
+        setCartItems(cartData);
       });
 
       return () => unsubscribe();
     }
   }, [userId]);
 
-  const deleteCartItem = async (productId) => {
+  const deleteCartItem = async (cartItemId) => {
     try {
-      const cartQuery = query(collection(db, 'Cart'), where('productId', '==', productId));
-      const cartSnapshot = await getDocs(cartQuery);  
-      cartSnapshot.forEach(async (doc) => {
+      const cartDocRef = collection(db, 'Cart');
+      const itemQuery = query(cartDocRef, where('productId', '==', cartItemId), where('userId', '==', userId));
+      const snapshot = await getDocs(itemQuery);
+
+      for (const doc of snapshot.docs) {
         await deleteDoc(doc.ref);
-      });
+      }
     } catch (error) {
-      console.error('Error deleting item:', error);
+      console.error('Error deleting cart item:', error);
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Cart</Text>
+      <Text style={styles.title}>Cart</Text>
       <FlatList
         data={cartItems}
         renderItem={({ item }) => (
           <CartItem
-            key={item.productId}
+            key={item.id} 
             productId={item.productId}
             quantity={item.quantity}
-            onDelete={() => deleteCartItem(item.productId)}
+            onDelete={() => deleteCartItem(item.productId)} 
           />
         )}
-        keyExtractor={(item) => item.productId}
+        keyExtractor={(item) => item.id}
         ListEmptyComponent={<Text>Your cart is empty</Text>}
       />
     </View>
@@ -77,7 +73,7 @@ function CartItem({ productId, quantity, onDelete }) {
   const [product, setProduct] = useState(null);
 
   useEffect(() => {
-    const getProduct = async () => {
+    const fetchProduct = async () => {
       try {
         const productRef = doc(db, 'Products', productId);
         const productSnap = await getDoc(productRef);
@@ -85,14 +81,14 @@ function CartItem({ productId, quantity, onDelete }) {
         if (productSnap.exists()) {
           setProduct(productSnap.data());
         } else {
-          console.log("Product not found for productId:", productId);
+          console.log(`Product not found for productId: ${productId}`);
         }
       } catch (error) {
-        console.error("Error fetching product:", error);
+        console.error('Error fetching product:', error);
       }
     };
 
-    getProduct();
+    fetchProduct();
   }, [productId]);
 
   if (!product) {
@@ -118,7 +114,7 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: '#dedede',
   },
-  text: {
+  title: {
     fontSize: 32,
     marginBottom: 10,
   },
@@ -154,7 +150,6 @@ const styles = StyleSheet.create({
   image: {
     width: '50%',
     height: 200,
-    left:10,
     borderRadius: 10,
     marginTop: 10,
   },
@@ -163,7 +158,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     paddingVertical: 5,
     paddingHorizontal: 10,
-    marginTop: 5,
   },
   deleteButtonText: {
     color: 'white',

@@ -1,10 +1,9 @@
-import React from 'react';
+import React  from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Link, Tabs } from 'expo-router';
-import { Pressable } from 'react-native';
+import { Tabs } from 'expo-router';
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
-import { useClientOnlyValue } from '@/components/useClientOnlyValue';
+import { DrawerToggleButton } from '@react-navigation/drawer';
 
 function TabBarIcon({ name, color }) {
   return <FontAwesome size={28} style={{ marginBottom: -3 }} name={name} color={color} />;
@@ -17,8 +16,9 @@ export default function TabLayout() {
 
     <Tabs
       screenOptions={{
+        headerLeft: () => <DrawerToggleButton tintColor='#000' />,
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false, 
+        // headerShown: false, 
       }}
     >
       <Tabs.Screen
@@ -28,13 +28,13 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
         }}
       />
-        <Tabs.Screen
+        {/* <Tabs.Screen
         name="categories"
         options={{
           title: 'Categories',
           tabBarIcon: ({ color }) => <TabBarIcon name="filter" color={color} />,
         }}
-      />
+      /> */}
         <Tabs.Screen
         name="favorite"
         options={{
