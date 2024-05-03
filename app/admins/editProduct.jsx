@@ -8,6 +8,7 @@ const EditProduct = ({ product, onClose }) => {
   const [name, setName] = useState(product.name);
   const [price, setPrice] = useState(product.price.toString());
   const [imageUrl, setImageUrl] = useState(product.imageUrl);
+  const [category, setcategory] = useState('');
 
   const handleUpdateProduct = async () => {
     try {
@@ -31,6 +32,7 @@ const EditProduct = ({ product, onClose }) => {
         name: name.trim(),
         price: parseFloat(price.trim()),
         imageUrl: imageUrl.trim(),
+        category: category.trim(),
       });
 
       alert('Product updated successfully');
@@ -63,6 +65,13 @@ const EditProduct = ({ product, onClose }) => {
         placeholder="Enter image URL"
         value={imageUrl}
         onChangeText={setImageUrl}
+      />
+      <Text style={styles.label}>category</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Enter category"
+        value={category}
+        onChangeText={setcategory}
       />
       {/* Update button with arrow icon */}
       <Pressable style={styles.updateButton} onPress={handleUpdateProduct}>

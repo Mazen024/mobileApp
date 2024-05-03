@@ -2,7 +2,8 @@ import React  from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Tabs } from 'expo-router';
 import Colors from '@/constants/Colors';
-import { useColorScheme } from '@/components/useColorScheme';
+import { useColorScheme } from "react-native";
+
 import { DrawerToggleButton } from '@react-navigation/drawer';
 
 function TabBarIcon({ name, color }) {

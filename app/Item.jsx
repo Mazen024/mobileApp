@@ -1,6 +1,9 @@
 import React from 'react';
-import { StyleSheet, Text, View, Image, Pressable} from 'react-native';
+import { StyleSheet, Text, View, Image, Pressable , Dimensions} from 'react-native';
 import { router } from "expo-router";
+
+const { width } = Dimensions.get('window');
+
 
 export default function Item({ name, price, image, productId }) {
   return (
@@ -18,13 +21,13 @@ export default function Item({ name, price, image, productId }) {
 
 const styles = StyleSheet.create({
   item: {
-    backgroundColor: '#fff',
+    backgroundColor: 'lightgray',
     borderRadius: 10,
     padding: 5,
   },
   image: {
-    width: 80,
-    height: 80,
+    width: '100%',
+    height: 100,
     borderRadius: 10,
     marginRight: 20,
   },
@@ -32,7 +35,7 @@ const styles = StyleSheet.create({
     // flex: 1,
   },
   name: {
-    fontSize: 18,
+    fontSize: 12,
     fontWeight: 'bold',
     marginBottom: 5,
   },

@@ -7,6 +7,8 @@ const AddProduct = () => {
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
   const [imageUrl, setImageUrl] = useState('');
+  const [category, setcategory] = useState('');
+
 
   const handleAddProduct = async () => {
     try {
@@ -19,6 +21,7 @@ const AddProduct = () => {
         name: name.trim(),
         price: parseFloat(price.trim()),
         imageUrl: imageUrl.trim(),
+        category: category.trim(),
       });
       alert('Item added');
     } catch (error) {
@@ -49,6 +52,13 @@ const AddProduct = () => {
         placeholder="Enter image URL"
         value={imageUrl}
         onChangeText={setImageUrl}
+      />
+      <Text style={styles.label}>category</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Enter category"
+        value={category}
+        onChangeText={setcategory}
       />
       <Pressable style={styles.addButton} onPress={handleAddProduct}>
         <Text style={styles.buttonText}>Add Product</Text>

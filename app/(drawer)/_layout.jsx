@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Image , Pressable} from "react-native";
+import { View, Text, StyleSheet, Image , Pressable } from "react-native";
 import React, { useEffect , useState } from "react";
 import { Drawer } from "expo-router/drawer";
 import { DrawerContentScrollView, DrawerItem } from "@react-navigation/drawer";
@@ -59,9 +59,9 @@ const CustomDrawerContent = (props) => {
               height={80}
               style={styles.userImg}
             />
-          <Text style={styles.userName}>Welcome </Text>
-          <View>
-          <Text style={styles.userName1}>{user.name}</Text>
+          <View style={styles.userName}>
+          <Text >Welcome </Text>
+          <Text >{user.name}</Text>
           </View>
         </View>
         ): (
@@ -97,7 +97,7 @@ const CustomDrawerContent = (props) => {
           <MaterialIcons
             name="favorite-outline"
             size={size}
-            color={pathname == "/favourites" ? "#fff" : "#000"}
+            color={pathname == "/favorite" ? "#fff" : "#000"}
           />
         )}
         label={"Favourites"}
@@ -135,7 +135,7 @@ const CustomDrawerContent = (props) => {
 export default function Layout() {
   return (
     <Drawer drawerContent={(props) => <CustomDrawerContent {...props} />} screenOptions={{headerShown: false}}>
-      <Drawer.Screen name="favourites" options={{headerShown: true}} />
+      {/* <Drawer.Screen name="favorite" options={{headerShown: true}} /> */}
       <Drawer.Screen name="settings" options={{headerShown: true}} />
     </Drawer>
   );
@@ -162,11 +162,9 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   userName: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  userName1: {
     fontSize: 25,
     fontWeight: 'bold',
+    flex:1,
+
   },
 });

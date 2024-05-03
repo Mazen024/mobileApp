@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {Text,View,StyleSheet,SafeAreaView,FlatList,Pressable,TextInput,Animated,Dimensions} from 'react-native';
+import {Text,View,StyleSheet,SafeAreaView,FlatList,Pressable,TextInput,Animated,Dimensions , ScrollView , SectionList} from 'react-native';
 import { addDoc, getDocs,where , query,collection, onSnapshot, deleteDoc } from 'firebase/firestore';
 import { db } from '../../../firebase';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
@@ -18,6 +18,26 @@ export default function Home() {
   const [userId, setUserId] = useState(null);
   const [favorites, setFavorites] = useState({}); 
   const [addedToCart, setAddedToCart] = useState(true);
+  const [filteredLaptops, setFilteredLaptops] = useState([]);
+  const [filteredPhones, setFilteredPhones] = useState([]);
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    const laptops = products.filter((item) => item.category === 'laptop');
+    const phones = products.filter((item) => item.category === 'phone');
+
+    setFilteredLaptops(
+      laptops.filter((item) =>
+        item.name.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    );
+
+    setFilteredPhones(
+      phones.filter((item) =>
+        item.name.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    );
+  }, [products, searchTerm]);
 
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(getAuth(), (user) => {
@@ -50,6 +70,17 @@ export default function Home() {
     );
     setFilteredData(filteredResults);
   }, [searchTerm, data]);
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(collection(db, 'Products'), (snapshot) => {
+      const fetchedProducts = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setProducts(fetchedProducts);
+    });
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     if (userId) {
@@ -135,89 +166,104 @@ export default function Home() {
       console.error('Error adding item to cart:', error);
     }
   };
-  return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search products..."
-          value={searchTerm}
-          onChangeText={(text) => setSearchTerm(text)}
+
+  const renderProduct = ({ item }) => (
+    <View style={styles.itemContainer}>
+      <View style={styles.itemActions}>
+        <Pressable onPress={() => toggleFavorite(item.id)}>
+          <Ionicons
+            name="heart"
+            size={30}
+            color={favorites[item.id] ? 'red' : 'white'}
+          />
+        </Pressable>
+      </View>
+      <Item
+        name={item.name}
+        price={item.price}
+        image={item.imageUrl}
+        productId={item.id}
+      />
+      <View style={styles.itemActions}>
+        <Pressable
+          style={styles.itemActions}
+          onPress={() => addToCart(item.name)}
+        >
+        <Ionicons
+          name="add-circle"
+          size={30}
+          color={addedToCart ? 'gray' : 'red'}
         />
+        </Pressable>
+        </View>
+    </View>
+  );
+
+
+  return (
+    <ScrollView style={styles.scrollContainer}>
+      <SafeAreaView style={styles.safeContainer}>
+        {/* Header Section */}
+        <View style={styles.header}>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search products..."
+            value={searchTerm}
+            onChangeText={(text) => setSearchTerm(text)}
+          />
         <Pressable
           style={styles.cardButton}
           onPress={() => router.push('/card')}
         >
-          <Ionicons name="card" size={30} color="black" />
+        <Ionicons name="card" size={30} color="black" />
         </Pressable>
-      </View >
-      <View style={styles.slider}>
-      <Slider/>
-      </View>
-      <FlatList
-        data={filteredData}
-        renderItem={({ item, index }) => (
-          <Animated.View
-            style={[
-              styles.itemContainer,
-              {
-                marginRight: index % 2 === 0 ? 10 : 0,
-                marginLeft: index % 2 === 0 ? 0 : 10,
-              },
-            ]}
-          >
-            <Item
-              name={item.name}
-              price={item.price}
-              image={item.imageUrl}
-            />
-            <View style={styles.itemActions}>
-              <Pressable
-                onPress={() => toggleFavorite(item.id)}
-              >
-                <Ionicons
-                  name="heart"
-                  size={30}
-                  color={favorites[item.id] ? 'red' : 'gray'}
-                />
-              </Pressable>
-              
-              <Pressable
-                style={styles.itemActions}
-                onPress={() => addToCart(item.name)}
-              >
-                <Ionicons
-                  name="add-circle"
-                  size={30}
-                  color={addedToCart ? 'gray' : 'red'}
-                />
-                {/* <Text style={styles.addCart}>
-                  {addedToCart[item.name] ? 'Added to Cart' : 'Add to Cart'}
-                </Text> */}
-              </Pressable>
-            </View>
-          </Animated.View>
-        )}
-        keyExtractor={(item) => item.id}
-        numColumns={2}
-        ListEmptyComponent={
-          <Text style={styles.emptyText}>No products found</Text>
-        }
-      />
-    </SafeAreaView>
+        </View>
+
+        {/* Slider Section */}
+        <View style={styles.slider}>
+          <Slider />
+        </View>
+
+        {/* Laptops Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Laptops</Text>
+          <FlatList
+            data={filteredLaptops}
+            horizontal={true} // Horizontal scrolling
+            renderItem={renderProduct}
+            keyExtractor={(item) => item.id}
+            // horizontal={false} // Vertical orientation
+            // numColumns={2}
+            ListEmptyComponent={
+            <Text style={styles.emptyText}>No laptops found</Text>
+            }
+          />
+        </View>
+
+        {/* Phones Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Phones</Text>
+          <FlatList
+            data={filteredPhones}
+            renderItem={renderProduct}
+            keyExtractor={(item) => item.id}
+            numColumns={2}
+            ListEmptyComponent={
+              <Text style={styles.emptyText}>No phones found</Text>
+            }
+          />
+        </View>
+      </SafeAreaView>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  slider:{
-    flex: 1,
-    marginBottom: 50,
-  },
   container: {
     flex: 1,
     paddingTop: 20,
     paddingHorizontal: 20,
-    backgroundColor: 'lightgray',
+    backgroundColor: '#fff',
   },
   header: {
     flexDirection: 'row',
@@ -228,7 +274,7 @@ const styles = StyleSheet.create({
   itemActions: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'left',
   },
   searchInput: {
     flex: 1,
@@ -239,32 +285,49 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: 'white',
   },
-  addCartButton: {
-    backgroundColor: 'blue',
-    padding: 5,
-    borderRadius: 5,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 10,
-    width: '70%',
+  scrollContainer: {
+    flex: 1,
   },
-  addCart: {
-    color: 'white',
+  safeContainer: {
+    padding: 20,
+  },
+  slider: {
+    height: 200, // Set height for the slider
+    marginBottom: 20,
+  },
+  section: {
+    marginBottom: 20,
+  },
+  sectionTitle: {
+    fontSize: 24,
     fontWeight: 'bold',
-    fontSize: 18,
+    marginBottom: 10,
   },
-  addedToCartButton: {
-    backgroundColor: 'green',
+  itemContainer: {
+    padding: 10,
+    borderRadius: 10,
+    backgroundColor: '#f5f5f5',
+    marginBottom: 10,
+  },
+  itemActions: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start', // Align items on the left
+  },
+  emptyText: {
+    textAlign: 'center',
+    fontSize: 18,
+    color: '#666',
   },
   cardButton: {
     marginLeft: 10,
   },
   itemContainer: {
     width: (width - 60) / 2,
-    backgroundColor: '#FFFFFF',
     padding: 10,
     borderRadius: 10,
     marginBottom: 15,
+    backgroundColor : 'lightgray',
+    marginLeft: 10,
   },
   emptyText: {
     textAlign: 'center',
@@ -272,3 +335,4 @@ const styles = StyleSheet.create({
     color: '#666',
   },
 });
+
