@@ -13,9 +13,9 @@ const CustomDrawerContent = (props) => {
   const [user, setUser] = useState(null);
   const [profileImage, setProfileImage] = useState(null);
 
-  useEffect(() => {
-    console.log(pathname);
-  }, [pathname]);
+  // useEffect(() => {
+  //   console.log(pathname);
+  // }, [pathname]);
 
   useEffect(() => {
     const auth = getAuth();
@@ -136,7 +136,7 @@ export default function Layout() {
   return (
     <Drawer drawerContent={(props) => <CustomDrawerContent {...props} />} screenOptions={{headerShown: false}}>
       {/* <Drawer.Screen name="favorite" options={{headerShown: true}} /> */}
-      <Drawer.Screen name="settings" options={{headerShown: true}} />
+      {/* <Drawer.Screen name="settings" options={{headerShown: true}} /> */}
     </Drawer>
   );
 }

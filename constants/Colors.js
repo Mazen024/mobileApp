@@ -19,4 +19,4 @@ const colorScheme = {
 };
 
 // Export the default color scheme
-export default colorScheme;
+module.exports = colorScheme;

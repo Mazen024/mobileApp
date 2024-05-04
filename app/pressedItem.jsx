@@ -9,6 +9,7 @@ export default function PressedItem() {
   const [itemData, setItemData] = useState([]);
 
   useEffect(() => {
+    console.log(name)
     const fetchItemData = async () => {
       try {
         const querySnapshot = await getDocs(query(collection(db, "Products"),where("name", "==", name)));
@@ -28,6 +29,7 @@ export default function PressedItem() {
   }, [name]);
 
   return (
+    console.log(itemData),
     <View style={styles.container}>
       <View style={styles.textContainer}>
         {itemData ? (
@@ -40,7 +42,7 @@ export default function PressedItem() {
         )}
       </View>
       {itemData && (
-        <Image source={{ uri: itemData.image }} style={styles.image} />
+        <Image source={{ uri: itemData.imageUrl }} style={styles.image} />
       )}
     </View>
   );  

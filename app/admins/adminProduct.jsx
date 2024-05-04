@@ -218,6 +218,7 @@ const styles = StyleSheet.create({
   },
   productInfo: {
     flex: 1,
+    
   },
   deleteButton: {
     padding: 10,

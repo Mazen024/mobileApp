@@ -8,7 +8,7 @@ const { width } = Dimensions.get('window');
 export default function Item({ name, price, image, productId }) {
   return (
     <View style={styles.item}>
-      <Pressable onPress={() => router.push(`/pressedItem?name=${name}&price=${price}&image=${image}&productId=${productId}`)}>
+      <Pressable onPress={() => router.push(`/pressedItem?name=${name}`)}>
         <Image source={{ uri: image }} style={styles.image} />
       </Pressable>
       <View style={styles.infoContainer}>

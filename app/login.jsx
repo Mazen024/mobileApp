@@ -4,8 +4,6 @@ import { Link, router } from "expo-router";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
-import back from '../assets/images/back.jpeg';
-import logo from '../assets/images/pngwing.com.png';
 
 const CustomAlert = ({ message }) => (
   <View style={styles.alertContainer}>
@@ -67,8 +65,8 @@ const Login = () => {
   };
 
   return (
-    <ImageBackground source={back}  style={styles.background1} >
-    <Image source= {logo} resizeMode="contain" style={styles.logo}/>
+    // <ImageBackground source={back}  style={styles.background1} >
+    // <Image source= {logo} resizeMode="contain" style={styles.logo}/>
     <View style={styles.container}>
       <Text style={styles.title}>Login</Text>
       <TextInput
@@ -95,24 +93,13 @@ const Login = () => {
       </Text>
       {errors && <CustomAlert message={errors} />}
     </View>
-    </ImageBackground>
+    // </ImageBackground>
   );
 };
 
 export default Login;
 
 const styles = StyleSheet.create({
-  logo: {
-    marginTop : 30 ,
-    marginBottom : 50,
-    width: '50%', 
-    height: '20%',
-  },
-  background1 : {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   background1 : {
     flex: 1,
     alignItems: 'center',
