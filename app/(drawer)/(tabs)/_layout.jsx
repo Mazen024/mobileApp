@@ -17,8 +17,9 @@ export default function TabLayout() {
 
     <Tabs 
       screenOptions={{
-        headerLeft: () => <DrawerToggleButton tintColor='#000' />,
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+        headerLeft: () => <DrawerToggleButton tintColor= "lightgray" />,
+        headerTintColor: "lightgray",
+        headerStyle: {backgroundColor: "#0a4a7c"},
         tabBarStyle : {borderTopLeftRadius : 25, borderTopRightRadius: 25 , backgroundColor :"#0a4a7c" },
         // headerShown: false, 
       }}
@@ -27,7 +28,7 @@ export default function TabLayout() {
         name="Home"
         options={{
           title: 'Home',
-          tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
+          tabBarIcon: ({ color }) => <TabBarIcon name="home" color="lightgray" />,
         }}
       />
         {/* <Tabs.Screen
@@ -41,14 +42,14 @@ export default function TabLayout() {
         name="favorite"
         options={{
           title: 'Favorite',
-          tabBarIcon: ({ color }) => <TabBarIcon name="heart" color={color} />,
+          tabBarIcon: ({ color }) => <TabBarIcon name="heart" color="lightgray" />,
         }}
       />
         <Tabs.Screen
           name="profile"
           options={{
             title: 'Profile',
-            tabBarIcon: ({ color }) => <TabBarIcon  name="user" color={color} />,
+            tabBarIcon: ({ color }) => <TabBarIcon  name="user" color="lightgray" />,
           }}
         />
     </Tabs>

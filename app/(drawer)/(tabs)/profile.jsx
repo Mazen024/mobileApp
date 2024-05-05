@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, Pressable, StyleSheet, Image, Alert } from 'react-native';
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { getAuth, onAuthStateChanged ,signOut } from 'firebase/auth';
 import { collection, query, where, getDocs, updateDoc  } from 'firebase/firestore';
 import { db } from '../../../firebase';
 import { Ionicons } from '@expo/vector-icons'; 
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
+import { ScrollView } from 'react-native-gesture-handler';
 
 const Profile = () => {
   const router = useRouter();
@@ -54,7 +55,7 @@ const Profile = () => {
   
     return () => unsubscribe();
   }, []);
-  
+
   const handleImageUpload = async () => {
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (permissionResult.granted === false) {
@@ -72,7 +73,7 @@ const Profile = () => {
     if (!imageResult.canceled && imageResult.assets[0].uri) {
       try {
         const querySnapshot = await getDocs(
-          query(collection(db, 'users'), where('userId', '==', user.uid))
+          query(collection(db, 'users'), where('name', '==', user.name))
         );
         if (querySnapshot.empty) {
           alert('User not found.');
@@ -90,74 +91,9 @@ const Profile = () => {
         console.error('Error updating user document:', error);
       }
     } else {
-      console.log('Image selection canceled or URI not present');
+      console.log('Image selection canceled or URI not present:', imageResult);
     }
   };
-
-  // // const handleSaveChanges = async () => {
-  // //   if (!user) return;
-  
-  // //   try {
-  // //     const querySnapshot = await getDocs(
-  // //       query(collection(db, 'users'), where('userId', '==', user.uid))
-  // //     );
-  // //     if (querySnapshot.empty) {
-  // //       alert('User not found.');
-  // //       return;
-  // //     }
-  
-  // //     const docRef = querySnapshot.docs[0].ref;
-  
-  // //     const updateData = {};
-  // //     ['name', 'email', 'age', 'gender', 'city'].forEach((field) => {
-  // //       if (user[field] !== formData[field]) {
-  // //         updateData[field] = formData[field];
-  // //       }
-  // //     });
-  
-  // //     if (Object.keys(updateData).length > 0) {
-  // //       await updateDoc(docRef, updateData);
-  // //       setUser({ ...user, ...updateData }); // Update user data locally
-  // //       Alert.alert('Success', 'Profile updated successfully');
-  // //     }
-  
-  // //     setCurrentlyEditing(null); // Exit edit mode
-  // //   } catch (error) {
-  // //     console.error('Error updating user document:', error);
-  // //   }
-  // // };
-  // const handleSaveChanges = async () => {
-  //   if (!user || !formData) return;
-  
-  //   try {
-  //     const querySnapshot = await getDocs(
-  //       query(collection(db, 'users'), where('userId', '==', user.uid))
-  //     );
-  //     if (querySnapshot.empty) {
-  //       console.warn('User not found');
-  //       return;
-  //     }
-  
-  //     const docRef = querySnapshot.docs[0].ref;
-  
-  //     const updateData = {};
-  //     ['name', 'email', 'age', 'gender', 'city'].forEach((field) => {
-  //       if (formData[field] !== undefined && user[field] !== formData[field]) {
-  //         updateData[field] = formData[field];
-  //       }
-  //     });
-  
-  //     if (Object.keys(updateData).length > 0) {
-  //       await updateDoc(docRef, updateData);
-  //       setUser({ ...user, ...updateData }); // Update user data locally
-  //       Alert.alert('Success', 'Profile updated successfully');
-  //     }
-  
-  //     setCurrentlyEditing(null); // Exit edit mode
-  //   } catch (error) {
-  //     console.error('Error updating user document:', error);
-  //   }
-  // };
   
   const handleSaveChanges = async () => {
     if (!user) {
@@ -204,6 +140,16 @@ const Profile = () => {
     }
   };
 
+  const handleSignOut = async () => {
+    try {
+      const auth = getAuth();
+      await signOut(auth);
+      router.replace('/login');
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  };
+
   if (!user) {
     return (
       <View style={styles.signInPrompt}>
@@ -216,6 +162,8 @@ const Profile = () => {
   }
   
   return (
+    <ScrollView>
+
     <View style={styles.container}>
     {user ? (
       <View style={styles.profileBox}>
@@ -223,7 +171,7 @@ const Profile = () => {
           <Image
             source={profileImage ? { uri: profileImage } : require('../../../assets/images/th.jpg')}
             style={styles.profileImage}
-          />
+            />
           <Pressable onPress={handleImageUpload} style={styles.cameraIcon}>
             <Ionicons name="camera" size={24} color="white" />
           </Pressable>
@@ -234,11 +182,11 @@ const Profile = () => {
             <View key={field} style={styles.fieldContainer}>
               {currentlyEditing === field ? (
                 <TextInput
-                  style={styles.input}
-                  value={formData[field]}
-                  onChangeText={(text) => setFormData({ ...formData, [field]: text })}
-                  placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
-                  onBlur={() => setCurrentlyEditing(null)} // Exit edit mode when focus is lost
+                style={styles.input}
+                value={formData[field]}
+                onChangeText={(text) => setFormData({ ...formData, [field]: text })}
+                placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
+                onBlur={() => setCurrentlyEditing(null)} // Exit edit mode when focus is lost
                 />
               ) : (
                 <Text style={styles.userText}>
@@ -248,7 +196,7 @@ const Profile = () => {
               <Pressable
                 style={styles.editIcon}
                 onPress={() => setCurrentlyEditing(field)} // Start editing this field
-              >
+                >
                 <Ionicons name="create-outline" size={24} color="gray" />
               </Pressable>
             </View>
@@ -264,12 +212,18 @@ const Profile = () => {
     ) : (
       <View style={styles.signInPrompt}>
         <Text style={styles.promptText}>Please sign in</Text>
-        <Pressable style={styles.signInButton} onPress={() => {'login'}}>
+        <Pressable style={styles.signInButton} onPress={() => router.push('login')}>
           <Text style={styles.signInButtonText}>Sign In</Text>
         </Pressable>
       </View>
     )}
+      <View>
+        <Pressable style={styles.signOutButton} onPress={handleSignOut}>
+           <Text style={styles.signOutButtonText}>Sign Out</Text>
+        </Pressable>
+      </View>
   </View>
+</ScrollView>
 
   );
 };
@@ -280,6 +234,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: 10,
+    Width: '90%',
   },
   editIcon: {
     padding: 10,
@@ -288,6 +243,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     backgroundColor: '#F3F4F6',
+    // Width: '100%',
   },
   profileBox: {
     borderRadius: 10,
@@ -314,7 +270,7 @@ const styles = StyleSheet.create({
     padding: 5,
   },
   userInfo: {
-    alignItems: 'center',
+    alignItems: 'left',
     padding: 20,
   },
   userText: {
@@ -354,11 +310,14 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 30,
     borderRadius: 8,
+    width: "60%",
+    alignSelf: 'center',
   },
   signOutButtonText: {
     color: 'white',
     fontWeight: 'bold',
     fontSize: 18,
+    alignSelf: 'center',
   },
   signInPrompt: {
     alignItems: 'center',

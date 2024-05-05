@@ -46,7 +46,7 @@ const CustomDrawerContent = (props) => {
 
   return (
     <DrawerContentScrollView {...props} 
-    style = {{backgroundColor : '#fff' , borderRadius : 20}}>
+    style = {{backgroundColor : '#fff' }}>
       <View >
         {user ? (
           <View style={styles.userInfoWrapper}>
@@ -76,7 +76,7 @@ const CustomDrawerContent = (props) => {
           <AntDesign
             name="user"
             size={size}
-            color={pathname == "/profile" ? "#fff" : "#0a4a7c"}
+            color={pathname == "/profile" ? "#fff" : "#000"}
           />
         )}
         label={"Profile"}
@@ -84,7 +84,7 @@ const CustomDrawerContent = (props) => {
           styles.navItemLabel,
           { color: pathname == "/profile" ? "#fff" : "#000" },
         ]}
-        style={{ backgroundColor: pathname == "/profile" ? "#333" : "#fff" }}
+        style={{ backgroundColor: pathname == "/profile" ? "#0a4a7c" : "#fff" }}
         onPress={() => {
           router.push("/(drawer)/(tabs)/profile");
         }}
@@ -102,7 +102,7 @@ const CustomDrawerContent = (props) => {
           styles.navItemLabel,
           { color: pathname == "/favorite" ? "#fff" : "#000" },
         ]}
-        style={{ backgroundColor: pathname == "/favorite" ? "#333" : "#fff" }}
+        style={{ backgroundColor: pathname == "/favorite" ? "#0a4a7c" : "#fff" }}
         onPress={() => {
           router.push("/favorite");
         }}
@@ -120,7 +120,7 @@ const CustomDrawerContent = (props) => {
           styles.navItemLabel,
           { color: pathname == "/settings" ? "#fff" : "#000" },
         ]}
-        style={{ backgroundColor: pathname == "/settings" ? "#333" : "#fff" }}
+        style={{ backgroundColor: pathname == "/settings" ? "#0a4a7c" : "#fff" }}
         onPress={() => {
           router.push("/settings");
         }}
@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
   },
   signInButton: {
     width:"60%",
-    backgroundColor: '#3B82F6',
+    backgroundColor: "#0a4a7c",
     paddingVertical: 12,
     paddingHorizontal: 30,
     borderRadius: 8,

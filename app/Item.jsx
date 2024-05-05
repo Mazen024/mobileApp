@@ -19,7 +19,7 @@ export default function Item({ name, price, image, productId }) {
 
 const styles = StyleSheet.create({
   item: {
-    backgroundColor: 'lightgray',
+    backgroundColor: 'white',
     borderRadius: 10,
     padding: 5,
   },
