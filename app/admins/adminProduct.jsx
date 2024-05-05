@@ -109,10 +109,11 @@ export default function adminProduct() {
         renderItem={({ item }) => (
           <Animated.View style={styles.itemContainer}>
             <View style={styles.productInfo}>
-              <Item
+              <Item style={styles.image}
                 name={item.name}
                 price={item.price}
                 image={item.imageUrl}
+                productId={item.id}
               />
             </View>
             <View>
@@ -141,6 +142,9 @@ const styles = StyleSheet.create({
     paddingTop: 40,
     paddingHorizontal: 20,
     backgroundColor: '#F0F0F0',
+  },
+  image: {
+    resizeMode: "contain"
   },
   signOutButton: {
     backgroundColor: '#FF6347',
@@ -218,7 +222,6 @@ const styles = StyleSheet.create({
   },
   productInfo: {
     flex: 1,
-    
   },
   deleteButton: {
     padding: 10,

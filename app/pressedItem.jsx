@@ -1,21 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, Image } from 'react-native';
 import { useLocalSearchParams } from "expo-router";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import { doc, getDoc } from "firebase/firestore";
 import { db } from '../firebase'; 
 
 export default function PressedItem() {
-  const { name } = useLocalSearchParams();
+  const { productId } = useLocalSearchParams();
   const [itemData, setItemData] = useState([]);
 
   useEffect(() => {
-    console.log(name)
     const fetchItemData = async () => {
       try {
-        const querySnapshot = await getDocs(query(collection(db, "Products"),where("name", "==", name)));
-
-        if (!querySnapshot.empty) {
-          const data = querySnapshot.docs[0].data();
+        const docRef = doc(db, "Products", productId);
+        const docSnap = await getDoc(docRef);
+  
+        if (docSnap.exists()) {
+          const data = docSnap.data();
           setItemData(data);
         } else {
           console.log('Item not found');
@@ -26,10 +26,9 @@ export default function PressedItem() {
     };
 
     fetchItemData();
-  }, [name]);
+  }, [productId]);
 
   return (
-    console.log(itemData),
     <View style={styles.container}>
       <View style={styles.textContainer}>
         {itemData ? (

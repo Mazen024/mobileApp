@@ -287,6 +287,7 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     flex: 1,
+    backgroundColor: 'white',
   },
   safeContainer: {
     padding: 20,

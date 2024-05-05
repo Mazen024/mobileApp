@@ -1,24 +1,27 @@
-import { View, Text, ImageBackground, StyleSheet, TouchableOpacity, Image, Pressable } from 'react-native';
-import React from 'react';
+import React, { useEffect } from 'react';
+import { View, Text, ImageBackground, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+
 import COLORS from '../constants/Colors'
-import logo from '../assets/images/logo.png'
+
 const Welcome = () => {
   const router = useRouter();
 
+  useEffect(() => {
+    // Timer to navigate to Home screen after 2 seconds
+    const timer = setTimeout(() => {
+      router.push('/Home');
+    }, 3000);
+
+    // Clear the timer when the component unmounts
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
-    <View style={styles.container}>
-        <View style={styles.closeIcon}>
-          <TouchableOpacity onPress={() => router.push('/Home')}>
-            <Ionicons name="close" size={20} color={'black'} />
-          </TouchableOpacity>
-        </View>
-        <Image source={logo} style = {styles.image} />
-        <View style={styles.welcomecontainer}>
-        <Text style={styles.welcome}> Welcom to our store !</Text>
-        <Text > </Text>
-        </View>
+    <View style={styles.Container}>
+      {/* <ImageBackground source={back} style={styles.background}> */}
+        {/* <Image source= {logo} resizeMode="contain" style={styles.logo} /> */}
+        <Text style={{ marginTop: 72 }}></Text>
         <View >
           <Pressable onPress={() => router.push('/login')}
             style={styles.btn} > 
@@ -26,12 +29,17 @@ const Welcome = () => {
           </Pressable>
         </View>
         <View style={styles.bottomContainer}>
-          <Text style={{ marginTop: 40 }}></Text>
-          <Text style={styles.bodyText1}>Don't have an account?</Text>
+          <Text style={{ marginTop: 72 }}></Text>
+          <Text style={styles.bodyText}>Don't have an account?</Text>
           <TouchableOpacity onPress={() => router.push('/signup')}>
             <Text style={styles.signUpText }>Signup</Text>
           </TouchableOpacity>
         </View> 
+        <View style={styles.bottomContainer}>
+          <TouchableOpacity onPress={() => router.push('/Home')}>
+            <Text style={styles.bodyText }>Login without registration</Text>
+          </TouchableOpacity>
+        </View>
       {/* </ImageBackground> */}
     </View>
   );
@@ -40,19 +48,43 @@ const Welcome = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 5,
-    backgroundColor: "white",
+    padding: 20,
+    backgroundColor: 'lightgray',
+  },
+  background: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  logo: {
+    width: 300, 
+    height: 300, 
+  },
+  title: {
+    width: 350 ,
+    fontSize: 20,
+    color: 'black',
+    backgroundColor: "#CBD5E1",
+    textTransform: 'uppercase',
+    borderColor : 'black',
+  },
+  subtitle: {
+    fontSize: 18,
+    color: 'black',
+
   },
   btn: {
-    width: "90%" ,
-    backgroundColor: "white",
-    borderColor : '#0a4a7c',
+    width: 350 ,
+    backgroundColor: '#fff',
+    borderColor : 'black',
+    color : 'white',
     paddingBottom: 16,
     paddingVertical: 10,
     borderWidth: 2,
     borderRadius: 12,
     alignItems: 'center',
-    alignSelf: 'center',
+    borderColor: COLORS.primary,
+    justifyContent: 'center'
   },
   bottomContainer: {
     flexDirection: 'row',
@@ -62,39 +94,15 @@ const styles = StyleSheet.create({
   },
   bodyText: {
     fontSize: 25,
-    color: '#0a4a7c',
+    color: 'black',
     fontWeight : 'bold',
-    alignSelf: 'center',
-    borderColor: COLORS.primary,
-  },
-  bodyText1: {
-    fontSize: 25,
-    color: '#3a3a3c',
-    fontWeight : 'bold',
-    alignSelf: 'center',
     borderColor: COLORS.primary,
   },
   signUpText: {
     fontSize: 18,
-    color: '#0a4a7c',
+    color: 'white',
     textDecorationLine: "underline", 
-    marginLeft : 10,
-  },
-  closeIcon: {
-    alignSelf: "flex-end",
-    marginTop: 40,
-    marginRight : 10,
-  },
-  welcome:{
-    fontSize: 30,
-    color: '#3a3a3c',
-    fontWeight : 'bold',
-    alignSelf: 'center',
-    borderColor: COLORS.primary,
-  },
-  welcomecontainer:{
-    alignSelf: 'center',
-    width: "90%",
+    marginLeft : 15,
   },
   image:{
     width: "80%",
