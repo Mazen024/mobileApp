@@ -3,11 +3,11 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Tabs } from 'expo-router';
 import Colors from '@/constants/Colors';
 import { useColorScheme } from "react-native";
-
 import { DrawerToggleButton } from '@react-navigation/drawer';
+import { BorderlessButton } from 'react-native-gesture-handler';
 
 function TabBarIcon({ name, color }) {
-  return <FontAwesome size={28} style={{ marginBottom: -3 }} name={name} color={color} />;
+  return <FontAwesome size={28} style={ { marginBottom: -3 }} name={name} color={color} />;
 }
 
 export default function TabLayout() {
@@ -15,10 +15,11 @@ export default function TabLayout() {
 
   return (
 
-    <Tabs
+    <Tabs 
       screenOptions={{
         headerLeft: () => <DrawerToggleButton tintColor='#000' />,
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+        tabBarStyle : {borderTopLeftRadius : 25, borderTopRightRadius: 25 , backgroundColor :"#0a4a7c" },
         // headerShown: false, 
       }}
     >
