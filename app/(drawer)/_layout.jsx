@@ -13,10 +13,6 @@ const CustomDrawerContent = (props) => {
   const [user, setUser] = useState(null);
   const [profileImage, setProfileImage] = useState(null);
 
-  // useEffect(() => {
-  //   console.log(pathname);
-  // }, [pathname]);
-
   useEffect(() => {
     const auth = getAuth();
     const unsubscribe = onAuthStateChanged(auth, async (authenticatedUser) => {
@@ -49,7 +45,8 @@ const CustomDrawerContent = (props) => {
   }, []);
 
   return (
-    <DrawerContentScrollView {...props}>
+    <DrawerContentScrollView {...props} 
+    style = {{backgroundColor : '#fff' , borderRadius : 20}}>
       <View >
         {user ? (
           <View style={styles.userInfoWrapper}>
@@ -79,7 +76,7 @@ const CustomDrawerContent = (props) => {
           <AntDesign
             name="user"
             size={size}
-            color={pathname == "/profile" ? "#fff" : "#000"}
+            color={pathname == "/profile" ? "#fff" : "#0a4a7c"}
           />
         )}
         label={"Profile"}
@@ -134,7 +131,9 @@ const CustomDrawerContent = (props) => {
 
 export default function Layout() {
   return (
-    <Drawer drawerContent={(props) => <CustomDrawerContent {...props} />} screenOptions={{headerShown: false}}>
+    <Drawer drawerContent={(props) => <CustomDrawerContent {...props} />} 
+    screenOptions={{headerShown: false}}
+    >
       {/* <Drawer.Screen name="favorite" options={{headerShown: true}} /> */}
       {/* <Drawer.Screen name="settings" options={{headerShown: true}} /> */}
     </Drawer>
@@ -142,6 +141,29 @@ export default function Layout() {
 }
 
 const styles = StyleSheet.create({
+  promptText: {
+    fontSize: 18,
+    color: '#1F2937',
+    marginBottom: 15,
+    alignSelf: 'center',
+    marginTop: 15,
+  },
+  signInButton: {
+    width:"60%",
+    backgroundColor: '#3B82F6',
+    paddingVertical: 12,
+    paddingHorizontal: 30,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    alignSelf: 'center',
+    marginBottom: 20,
+  },
+  signInButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 18,
+  },
   navItemLabel: {
     marginLeft: -20,
     fontSize: 18,
