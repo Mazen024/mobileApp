@@ -1,14 +1,12 @@
 import React from 'react';
-import { StyleSheet, Text, View, Image, Pressable , Dimensions} from 'react-native';
+import { StyleSheet, Text, View, Image, Pressable } from 'react-native';
 import { router } from "expo-router";
-
-const { width } = Dimensions.get('window');
 
 
 export default function Item({ name, price, image, productId }) {
   return (
     <View style={styles.item}>
-      <Pressable onPress={() => router.push(`/pressedItem?name=${name}`)}>
+      <Pressable onPress={() => router.push(`/pressedItem?productId=${productId}`)}>
         <Image source={{ uri: image }} style={styles.image} />
       </Pressable>
       <View style={styles.infoContainer}>
@@ -26,7 +24,7 @@ const styles = StyleSheet.create({
     padding: 5,
   },
   image: {
-    width: '100%',
+    resizeMode: "contain",
     height: 100,
     borderRadius: 10,
     marginRight: 20,
