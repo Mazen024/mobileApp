@@ -174,14 +174,26 @@ export default function Home() {
         image={item.imageUrl}
         productId={item.id}
       />
+<<<<<<< HEAD
+=======
+      <View style={styles.itemActions}>
+>>>>>>> d723de6c85890613f386087c42fd1bad7ffeb2eb
         <Pressable style={styles.itemActions} onPress={() => toggleCart(item.id)}>
           <Ionicons
             name="add-circle"
             size={30}
+<<<<<<< HEAD
             color={addedToCart[item.id] ? "#0a4a7c" : 'lightgray'}
           />
         </Pressable>
       </View>
+=======
+            color={addedToCart[item.id] ? 'red' : 'gray'}
+          />
+        </Pressable>
+      </View>
+    </View>
+>>>>>>> d723de6c85890613f386087c42fd1bad7ffeb2eb
   );
   
 
@@ -200,7 +212,11 @@ export default function Home() {
           style={styles.cardButton}
           onPress={() => router.push('/card')}
         >
+<<<<<<< HEAD
         <Ionicons name="cart-outline" size={40} color="#0a4a7c" />
+=======
+        <Ionicons name="cart-outline" size={40} color="black" />
+>>>>>>> d723de6c85890613f386087c42fd1bad7ffeb2eb
         </Pressable>
         </View>
 

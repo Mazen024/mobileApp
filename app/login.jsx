@@ -104,9 +104,11 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+
   },
   container: {
     flex: 1,
+    backgroundColor: 'white',
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 20,
@@ -115,20 +117,20 @@ const styles = StyleSheet.create({
     fontSize: 70, 
     marginBottom: 40, 
     fontWeight: 'bold',
-    color: 'white', 
+    color: 'black', 
   },
   input: {
     width: 350,
     height: 55, 
-    backgroundColor: 'white', 
+    backgroundColor: 'white',
     borderColor: '#CBD5E1', 
     borderWidth: 1,
     borderRadius: 10, 
     marginBottom: 25,  
     paddingHorizontal: 15, 
   },
-  signUpText: {
-    color: '#10B981', 
+  SignUp: {
+    color: 'blue', 
     textDecorationLine: 'underline', 
     fontSize: 20, 
   },
@@ -146,7 +148,7 @@ const styles = StyleSheet.create({
   link: {
     marginTop: 15, 
     fontSize: 18, 
-    color: '#FBBF24',  
+    color: 'black',  
   },
   alertContainer: {
     backgroundColor: '#FEE2E2',

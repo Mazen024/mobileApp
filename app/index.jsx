@@ -73,6 +73,7 @@ import logo from '../assets/images/logo.png'
 const Welcome = () => {
   const router = useRouter();
 
+<<<<<<< HEAD
   return (
     <View style={styles.container}>
         <View style={styles.closeIcon}>
@@ -85,6 +86,34 @@ const Welcome = () => {
         <Text style={styles.welcome}> Welcom to our store!</Text>
         <Text > </Text>
         </View>
+=======
+  useEffect(() => {
+    // Timer to navigate to Home screen after 2 seconds
+    const timer = setTimeout(() => {
+      router.push('/Home');
+    }, 2000);
+
+    // Clear the timer when the component unmounts
+    return () => clearTimeout(timer);
+  }, []);
+
+  return (
+<<<<<<< HEAD
+    <ImageBackground
+      source={require('../assets/images/7515317.jpg')}
+      style={styles.background}
+      resizeMode="cover"
+    >
+      {/* <View style={styles.container}>
+        <Text style={styles.title}>Welcome to Your App</Text>
+      </View> */}
+    </ImageBackground>
+=======
+    <View style={styles.Container}>
+      {/* <ImageBackground source={back} style={styles.background}> */}
+        {/* <Image source= {logo} resizeMode="contain" style={styles.logo} /> */}
+        <Text style={{ marginTop: 72 }}></Text>
+>>>>>>> d723de6c85890613f386087c42fd1bad7ffeb2eb
         <View >
           <Pressable onPress={() => router.push('/login')}
             style={styles.btn} > 
@@ -100,6 +129,7 @@ const Welcome = () => {
         </View> 
       {/* </ImageBackground> */}
     </View>
+>>>>>>> ea43630eb0a8c024e13568fc8996184622c23b7e
   );
 };
 

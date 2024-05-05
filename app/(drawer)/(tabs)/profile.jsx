@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, Pressable, StyleSheet, Image, Alert } from 'react-native';
+<<<<<<< HEAD
 import { getAuth, onAuthStateChanged ,signOut } from 'firebase/auth';
+=======
+import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
+>>>>>>> d723de6c85890613f386087c42fd1bad7ffeb2eb
 import { collection, query, where, getDocs, updateDoc  } from 'firebase/firestore';
 import { db } from '../../../firebase';
 import { Ionicons } from '@expo/vector-icons'; 
@@ -149,6 +153,7 @@ const Profile = () => {
       console.error('Error signing out:', error);
     }
   };
+<<<<<<< HEAD
 
   if (!user) {
     return (
@@ -160,6 +165,8 @@ const Profile = () => {
       </View>
     );
   }
+=======
+>>>>>>> d723de6c85890613f386087c42fd1bad7ffeb2eb
   
   return (
     <ScrollView>
@@ -195,8 +202,13 @@ const Profile = () => {
               )}
               <Pressable
                 style={styles.editIcon}
+<<<<<<< HEAD
                 onPress={() => setCurrentlyEditing(field)} // Start editing this field
                 >
+=======
+                onPress={() => setCurrentlyEditing(field)}
+              >
+>>>>>>> d723de6c85890613f386087c42fd1bad7ffeb2eb
                 <Ionicons name="create-outline" size={24} color="gray" />
               </Pressable>
             </View>
@@ -208,11 +220,18 @@ const Profile = () => {
             <Text style={styles.saveButtonText}>Save</Text>
           </Pressable>
         )}
+        <Pressable style={styles.signOutButton} onPress={handleSignOut}>
+          <Text style={styles.signOutButtonText}>Sign Out</Text>
+        </Pressable>
       </View>
     ) : (
       <View style={styles.signInPrompt}>
         <Text style={styles.promptText}>Please sign in</Text>
+<<<<<<< HEAD
         <Pressable style={styles.signInButton} onPress={() => router.push('login')}>
+=======
+        <Pressable style={styles.signInButton} onPress={() => router.push('/login')}>
+>>>>>>> d723de6c85890613f386087c42fd1bad7ffeb2eb
           <Text style={styles.signInButtonText}>Sign In</Text>
         </Pressable>
       </View>
