@@ -10,7 +10,7 @@ const Welcome = () => {
     // Timer to navigate to Home screen after 2 seconds
     const timer = setTimeout(() => {
       router.push('/Home');
-    }, 3000);
+    }, 2000);
 
     // Clear the timer when the component unmounts
     return () => clearTimeout(timer);
@@ -22,9 +22,9 @@ const Welcome = () => {
       style={styles.background}
       resizeMode="cover"
     >
-      <View style={styles.container}>
+      {/* <View style={styles.container}>
         <Text style={styles.title}>Welcome to Your App</Text>
-      </View>
+      </View> */}
     </ImageBackground>
   );
 };

@@ -49,27 +49,28 @@ const CustomDrawerContent = (props) => {
   }, []);
 
   return (
-    <DrawerContentScrollView {...props}>
+    <DrawerContentScrollView style={styles.screenOptions} {...props}>
       <View >
         {user ? (
           <View style={styles.userInfoWrapper}>
             <Image
               source={{uri : profileImage}}
-              width={80}
-              height={80}
+              width={90}
+              height={90}
               style={styles.userImg}
             />
           <View style={styles.userName}>
-          <Text >Welcome </Text>
-          <Text >{user.name}</Text>
+            <Text style={styles.user}> Welcome </Text>
+            <Text style={styles.user}> {user.name} </Text>
           </View>
         </View>
         ): (
-          <View style={styles.signInPrompt}>
-          <Text style={styles.promptText}>You need to sign in</Text>
-          <Pressable style={styles.signInButton} onPress={() => router.push('login')}>
-            <Text style={styles.signInButtonText}>Sign In</Text>
-          </Pressable>
+        <View style={styles.signInPrompt}>
+            <Text style={styles.promptText}>You need to sign in</Text>
+            <Pressable style={styles.signInButton} onPress={() => router.push('login')}>
+              <Ionicons name="log-in-outline" size={30}/>
+              <Text style={styles.signInButtonText}>Sign In</Text>
+            </Pressable>
         </View>
         )
         }
@@ -146,7 +147,11 @@ const styles = StyleSheet.create({
     marginLeft: -20,
     fontSize: 18,
   },
+  screenOptions:{
+    backgroundColor: 'white',
+  },
   userInfoWrapper: {
+    backgroundColor: 'white',
     flexDirection: "row",
     paddingHorizontal: 10,
     paddingVertical: 20,
@@ -156,15 +161,37 @@ const styles = StyleSheet.create({
   },
   userImg: {
     borderRadius: 40,
+    resizeMode: 'contain'
   },
   userDetailsWrapper: {
     marginTop: 25,
     marginLeft: 10,
   },
   userName: {
-    fontSize: 25,
-    fontWeight: 'bold',
     flex:1,
-
+    flexDirection: 'column',
+    paddingHorizontal: "10%",
+    paddingVertical: "5%",
+  },
+  user: {
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  promptText:{
+    fontWeight: 'bold',
+    fontSize: 20,
+  },
+  signInButton:{
+    flexDirection: 'row',
+    backgroundColor: 'rgba(22, 22, 22, 0.2)',
+    width: '50%',
+    paddingVertical: 12,
+    borderRadius: 8,
+    textAlign: 'center',
+  },
+  signInButtonText:{
+    color: 'black',
+    fontWeight: 'bold',
+    fontSize: 18,
   },
 });

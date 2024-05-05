@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, FlatList, Image, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, FlatList, Image, TouchableOpacity, Pressable } from 'react-native';
 import { db } from '../firebase'; 
 import { collection, query, where, onSnapshot, deleteDoc, getDocs, getDoc, doc } from 'firebase/firestore';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
@@ -10,8 +10,8 @@ export default function Cart() {
 
   useEffect(() => {
     const auth = getAuth();
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUserId(user ? user.uid : null);
+    const unsubscribe = onAuthStateChanged(auth, (authenticatedUser) => {
+      setUserId(authenticatedUser ? authenticatedUser.uid : null);
     });
     return () => unsubscribe();
   }, []);
@@ -35,41 +35,51 @@ export default function Cart() {
     }
   }, [userId]);
 
-  const deleteCartItem = async (cartItemId) => {
+  const removeCartItem = async (productId) => {
     try {
-      const cartDocRef = collection(db, 'Cart');
-      const itemQuery = query(cartDocRef, where('productId', '==', cartItemId), where('userId', '==', userId));
-      const snapshot = await getDocs(itemQuery);
-
+      const q = query(
+        collection(db, 'Cart'),
+        where('productId', '==', productId),
+        where('userId', '==', userId)
+      );
+      const snapshot = await getDocs(q);
       for (const doc of snapshot.docs) {
         await deleteDoc(doc.ref);
       }
     } catch (error) {
-      console.error('Error deleting cart item:', error);
+      console.error('Error removing cart item:', error);
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Cart</Text>
+      <Text></Text>
       <FlatList
         data={cartItems}
         renderItem={({ item }) => (
           <CartItem
-            key={item.id} 
+            key={item.productId}
             productId={item.productId}
             quantity={item.quantity}
-            onDelete={() => deleteCartItem(item.productId)} 
+            onRemove={() => removeCartItem(item.productId)}
           />
         )}
-        keyExtractor={(item) => item.id}
-        ListEmptyComponent={<Text>Your cart is empty</Text>}
+        keyExtractor={(item) => item.productId}
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <Text style={styles.title}>Cart</Text>
+            <Text>Your cart is empty</Text>
+          </View>
+        }
       />
+      <Pressable onPress={() => router.push('CheckOut', { cartItems })}>
+        <Text style={styles.footer}>Check Out</Text>
+      </Pressable>
     </View>
   );
 }
 
-function CartItem({ productId, quantity, onDelete }) {
+function CartItem({ productId, quantity, onRemove }) {
   const [product, setProduct] = useState(null);
 
   useEffect(() => {
@@ -97,13 +107,12 @@ function CartItem({ productId, quantity, onDelete }) {
 
   return (
     <View style={styles.cartItem}>
-      <Text style={styles.productName}>{product.name}</Text>
-      <Text style={styles.price}>Price: ${product.price}</Text>
-      <Text style={styles.quantity}>Quantity: {quantity}</Text>
       <Image source={{ uri: product.imageUrl }} style={styles.image} />
-      <TouchableOpacity onPress={onDelete} style={styles.deleteButton}>
-        <Text style={styles.deleteButtonText}>Delete</Text>
-      </TouchableOpacity>
+      <View style={styles.itemDetails}>
+        <Text style={styles.productName}>{product.name}</Text>
+        <Text style={styles.price}>Price: ${product.price}</Text>
+        <Text style={styles.quantity}>Quantity: {quantity}</Text>
+      </View>
     </View>
   );
 }
@@ -114,14 +123,25 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: '#dedede',
   },
+  emptyContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: 1,
+  },
   title: {
     fontSize: 32,
     marginBottom: 10,
   },
+  footer: {
+    backgroundColor: 'blue',
+    color: 'white',
+    padding: 15,
+    textAlign: 'center',
+  },
   cartItem: {
+    flexDirection: 'row',
     backgroundColor: 'white',
     borderRadius: 10,
-    padding: 10,
     marginBottom: 10,
     shadowColor: '#000',
     shadowOffset: {
@@ -131,6 +151,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 2,
     elevation: 2,
+    padding: 10,
   },
   productName: {
     fontSize: 18,
@@ -148,10 +169,14 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   image: {
-    width: '50%',
-    height: 200,
+    width: 100,
+    height: 100,
     borderRadius: 10,
-    marginTop: 10,
+    resizeMode: 'cover'
+  },
+  itemDetails: {
+    marginLeft: 10,
+    flex: 1,
   },
   deleteButton: {
     backgroundColor: 'red',

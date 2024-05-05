@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, Pressable, StyleSheet, Image, Alert } from 'react-native';
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
 import { collection, query, where, getDocs, updateDoc  } from 'firebase/firestore';
 import { db } from '../../../firebase';
 import { Ionicons } from '@expo/vector-icons'; 
@@ -204,16 +204,15 @@ const Profile = () => {
     }
   };
 
-  if (!user) {
-    return (
-      <View style={styles.signInPrompt}>
-        <Text style={styles.promptText}>Please sign in</Text>
-        <Pressable style={styles.signInButton} onPress={() => {'login'}}>
-          <Text style={styles.signInButtonText}>Sign In</Text>
-        </Pressable>
-      </View>
-    );
-  }
+  const handleSignOut = async () => {
+    try {
+      const auth = getAuth();
+      await signOut(auth);
+      router.replace('/login');
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  };
   
   return (
     <View style={styles.container}>
@@ -247,7 +246,7 @@ const Profile = () => {
               )}
               <Pressable
                 style={styles.editIcon}
-                onPress={() => setCurrentlyEditing(field)} // Start editing this field
+                onPress={() => setCurrentlyEditing(field)}
               >
                 <Ionicons name="create-outline" size={24} color="gray" />
               </Pressable>
@@ -260,11 +259,14 @@ const Profile = () => {
             <Text style={styles.saveButtonText}>Save</Text>
           </Pressable>
         )}
+        <Pressable style={styles.signOutButton} onPress={handleSignOut}>
+          <Text style={styles.signOutButtonText}>Sign Out</Text>
+        </Pressable>
       </View>
     ) : (
       <View style={styles.signInPrompt}>
         <Text style={styles.promptText}>Please sign in</Text>
-        <Pressable style={styles.signInButton} onPress={() => {'login'}}>
+        <Pressable style={styles.signInButton} onPress={() => router.push('/login')}>
           <Text style={styles.signInButtonText}>Sign In</Text>
         </Pressable>
       </View>

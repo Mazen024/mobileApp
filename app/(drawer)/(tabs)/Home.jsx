@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {Text,View,StyleSheet,SafeAreaView,FlatList,Pressable,TextInput,Animated,Dimensions , ScrollView , SectionList} from 'react-native';
-import { addDoc, getDocs,where , query,collection, onSnapshot, deleteDoc } from 'firebase/firestore';
+import { addDoc, getDocs,where , query,collection, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '../../../firebase';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import Item from '../../Item';
@@ -107,7 +107,6 @@ export default function Home() {
     }
 
     if (favorites[productId]) {
-      // Remove from favorites
       const favoriteSnapshot = await getDocs(collection(db, 'Favorites'));
       const favoriteDoc = favoriteSnapshot.docs.find(
         (doc) => doc.data().productId === productId && doc.data().userId === userId
@@ -125,48 +124,39 @@ export default function Home() {
     }
   };
 
-  const addToCart = async (productName) => {
+  const toggleCart = async (productId) => {
     try {
       if (!userId) {
         alert('Please sign in to add items to your cart');
         return;
       }
   
-      // Get the product by its name
-      const productQuery = query(collection(db, 'Products'), where('name', '==', productName));
-      const productSnapshot = await getDocs(productQuery);
-  
-      if (productSnapshot.empty) {
-        console.log('Product not found');
-        return;
-      }
-  
-      const productDoc = productSnapshot.docs[0]; 
-      const productId = productDoc.id;
-  
       const cartQuery = query(collection(db, 'Cart'), where('userId', '==', userId), where('productId', '==', productId));
       const cartSnapshot = await getDocs(cartQuery);
   
       if (!cartSnapshot.empty) {
-        console.log('Product is already in the cart');
-        return;
-      }
+        // Remove from cart
+        const cartDoc = cartSnapshot.docs[0];
+        await deleteDoc(cartDoc.ref);
+        setAddedToCart((prev) => ({ ...prev, [productId]: false }));
+      } else {
+        // Add to cart
         const data = {
           userId,
           productId,
           quantity: 1,
         }
-      // Add the product to the cart with a quantity of 1
-      await addDoc(collection(db, 'Cart'),data);
-      setAddedToCart(data);
+        await addDoc(collection(db, 'Cart'), data);
+        setAddedToCart((prev) => ({ ...prev, [productId]: true }));
+      }
   
-      console.log(`Added ${productName} to the cart`);
+      console.log(`Toggled ${productId} in the cart`);
   
     } catch (error) {
-      console.error('Error adding item to cart:', error);
+      console.error('Error toggling cart:', error);
     }
   };
-
+  
   const renderProduct = ({ item }) => (
     <View style={styles.itemContainer}>
       <View style={styles.itemActions}>
@@ -185,20 +175,17 @@ export default function Home() {
         productId={item.id}
       />
       <View style={styles.itemActions}>
-        <Pressable
-          style={styles.itemActions}
-          onPress={() => addToCart(item.name)}
-        >
-        <Ionicons
-          name="add-circle"
-          size={30}
-          color={addedToCart ? 'gray' : 'red'}
-        />
+        <Pressable style={styles.itemActions} onPress={() => toggleCart(item.id)}>
+          <Ionicons
+            name="add-circle"
+            size={30}
+            color={addedToCart[item.id] ? 'red' : 'gray'}
+          />
         </Pressable>
-        </View>
+      </View>
     </View>
   );
-
+  
 
   return (
     <ScrollView style={styles.scrollContainer}>
@@ -215,7 +202,7 @@ export default function Home() {
           style={styles.cardButton}
           onPress={() => router.push('/card')}
         >
-        <Ionicons name="card" size={30} color="black" />
+        <Ionicons name="cart-outline" size={40} color="black" />
         </Pressable>
         </View>
 
@@ -229,7 +216,7 @@ export default function Home() {
           <Text style={styles.sectionTitle}>Laptops</Text>
           <FlatList
             data={filteredLaptops}
-            horizontal={true} // Horizontal scrolling
+            horizontal={true}
             renderItem={renderProduct}
             keyExtractor={(item) => item.id}
             // horizontal={false} // Vertical orientation
