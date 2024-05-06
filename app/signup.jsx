@@ -5,8 +5,7 @@ import { firebase } from "../firebase";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import { collection, addDoc } from "firebase/firestore";
 import { db } from "../firebase";
-import back from '../assets/images/back.jpeg';
-import logo from '../assets/images/pngwing.com.png';
+import Login from "./login";
 
 const CustomAlert = ({ message }) => (
   <View style={styles.alertContainer}>
@@ -49,9 +48,8 @@ const SignUp = () => {
   };
 
   return (
-    <ImageBackground source = {back} style= {styles.background1}>
-      <Image source= {logo} resizeMode="contain" style={styles.logo}/>
     <View style={styles.container}>
+      <Text style={styles.title}>Sign Up</Text>
       <TextInput
         style={styles.input}
         placeholder="Username"
@@ -82,33 +80,17 @@ const SignUp = () => {
         <Text style={styles.buttonText}>Sign Up</Text>
       </TouchableOpacity>
       <Text style={styles.link}>
-        Already have an account? <Link href={"./login"} style={styles.Login}>Log in</Link>
+        Already have an account? <Link href={"./login"} style={styles.Login}>Login</Link>
       </Text>
       {error && <CustomAlert message={error} />}
     </View>
-    </ImageBackground>
   );
 };
 
 const styles = StyleSheet.create({
-  logo: {
-    marginTop : 30 ,
-    marginBottom : 50,
-    width: '50%', 
-    height: '20%',
-  },
-  background1 : {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  background1 : {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   container: {
     flex: 1,
+    backgroundColor : "lightgray",
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 20,
@@ -117,13 +99,13 @@ const styles = StyleSheet.create({
     fontSize: 70, 
     marginBottom: 40, 
     fontWeight: 'bold',
-    color: 'white', 
+    color: "#0a4a7c", 
   },
   input: {
-    width: 350,
+    width: '100%',
     height: 55, 
     backgroundColor: 'white', 
-    borderColor: '#CBD5E1', 
+    borderColor: "#0a4a7c", 
     borderWidth: 1,
     borderRadius: 10, 
     marginBottom: 25,  
@@ -135,7 +117,7 @@ const styles = StyleSheet.create({
     fontSize: 20, 
   },
   button: {
-    backgroundColor: '#3B82F6',  
+    backgroundColor: "#0a4a7c",  
     paddingVertical: 14, 
     paddingHorizontal: 60, 
     borderRadius: 10, 
@@ -146,9 +128,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold', 
   },
   link: {
-    marginTop: 15, 
+    margin: 15, 
     fontSize: 18, 
-    color: '#FBBF24',  
+    color: '#000',  
   },
   alertContainer: {
     backgroundColor: '#FEE2E2',
@@ -160,6 +142,11 @@ const styles = StyleSheet.create({
     color: '#EF4444', 
     fontSize: 16, 
     textAlign: 'center', 
+  },
+  Login : {
+    color: "#0a4a7c", 
+    textDecorationLine: 'underline', 
+    fontSize: 20,  
   },
 });
 

@@ -31,13 +31,6 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <TabBarIcon name="home" color="lightgray" />,
         }}
       />
-        {/* <Tabs.Screen
-        name="categories"
-        options={{
-          title: 'Categories',
-          tabBarIcon: ({ color }) => <TabBarIcon name="filter" color={color} />,
-        }}
-      /> */}
         <Tabs.Screen
         name="favorite"
         options={{

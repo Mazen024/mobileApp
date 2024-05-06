@@ -15,11 +15,11 @@ export default function AppCarousel() {
         },{
             id: 2,
             title: 'Second Item',
-            image:  require('../assets/images/Image1.png')
+            image:  require('../assets/images/Image2.webp')
         },{
             id: 3,
             title: 'Third Item',
-            image: require('../assets/images/Image1.png')
+            image: require('../assets/images/Image3.png')
         },{
             id: 3,
             title: 'Fourth Item',
@@ -33,8 +33,8 @@ export default function AppCarousel() {
     return (
         <View style={{ flex: 1}}>
             <Carousel
-                width = {width - 40} I
-                height = {width / 2}
+                width = {width /1.15}
+                height = {width /2}
                 data = { list }
                 autoPlay={true}
                 pagingEnabled={pagingEnabled}
@@ -50,6 +50,7 @@ export default function AppCarousel() {
 }
 const styles = StyleSheet.create({
     CarouselItem: {
+    width : '100%',
     flex: 1,
     justifyContent: 'center', 
     overflow: 'hidden',

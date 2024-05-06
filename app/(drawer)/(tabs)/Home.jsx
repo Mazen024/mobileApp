@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import {Text,View,StyleSheet,SafeAreaView,FlatList,Pressable,TextInput,Animated,Dimensions , ScrollView , SectionList} from 'react-native';
+import {Text,View,StyleSheet,SafeAreaView,FlatList,Pressable,TextInput,Animated,Dimensions , ScrollView , SectionList } from 'react-native';
 import { addDoc, getDocs,where , query,collection, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '../../../firebase';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import Item from '../../Item';
-import { useRouter } from 'expo-router';
+import { useRouter , Link } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Slider from '../../slider';
 
@@ -19,12 +19,30 @@ export default function Home() {
   const [favorites, setFavorites] = useState({}); 
   const [addedToCart, setAddedToCart] = useState(true);
   const [filteredLaptops, setFilteredLaptops] = useState([]);
+  const [filteredPopular, setFilteredPopular] = useState([]);
+  const [filteredLatest, setFilteredLatest] = useState([]);
   const [filteredPhones, setFilteredPhones] = useState([]);
+  const [filteredAccessories , setFilteredAccessories] = useState([]);
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
+    const latest = products.filter((item) => item.category === 'latest');
+    const popular = products.filter((item) => item.category === 'popular');
     const laptops = products.filter((item) => item.category === 'laptop');
     const phones = products.filter((item) => item.category === 'phone');
+    const accessories = products.filter((item) => item.category === 'accessories');
+
+    setFilteredPopular(
+      popular.filter((item) =>
+        item.name.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    );
+
+    setFilteredLatest(
+      latest.filter((item) =>
+        item.name.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    );
 
     setFilteredLaptops(
       laptops.filter((item) =>
@@ -34,6 +52,11 @@ export default function Home() {
 
     setFilteredPhones(
       phones.filter((item) =>
+        item.name.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    );
+    setFilteredAccessories(
+      accessories.filter((item) =>
         item.name.toLowerCase().includes(searchTerm.toLowerCase())
       )
     );
@@ -150,7 +173,7 @@ export default function Home() {
         setAddedToCart((prev) => ({ ...prev, [productId]: true }));
       }
   
-      console.log(`Toggled ${productId} in the cart`);
+      console.log('Toggled ${productId} in the cart');
   
     } catch (error) {
       console.error('Error toggling cart:', error);
@@ -162,7 +185,7 @@ export default function Home() {
       <View style={styles.itemActions}>
         <Pressable onPress={() => toggleFavorite(item.id)}>
           <Ionicons
-            name="heart"
+            name="heart-outline"
             size={30}
             color={favorites[item.id] ? "#0a4a7c" : 'lightgray'}
           />
@@ -174,29 +197,16 @@ export default function Home() {
         image={item.imageUrl}
         productId={item.id}
       />
-<<<<<<< HEAD
-=======
-      <View style={styles.itemActions}>
->>>>>>> d723de6c85890613f386087c42fd1bad7ffeb2eb
         <Pressable style={styles.itemActions} onPress={() => toggleCart(item.id)}>
           <Ionicons
-            name="add-circle"
+            name="cart-outline"
             size={30}
-<<<<<<< HEAD
             color={addedToCart[item.id] ? "#0a4a7c" : 'lightgray'}
           />
         </Pressable>
       </View>
-=======
-            color={addedToCart[item.id] ? 'red' : 'gray'}
-          />
-        </Pressable>
-      </View>
-    </View>
->>>>>>> d723de6c85890613f386087c42fd1bad7ffeb2eb
   );
   
-
   return (
     <ScrollView style={styles.scrollContainer}>
       <SafeAreaView style={styles.safeContainer}>
@@ -212,11 +222,7 @@ export default function Home() {
           style={styles.cardButton}
           onPress={() => router.push('/card')}
         >
-<<<<<<< HEAD
         <Ionicons name="cart-outline" size={40} color="#0a4a7c" />
-=======
-        <Ionicons name="cart-outline" size={40} color="black" />
->>>>>>> d723de6c85890613f386087c42fd1bad7ffeb2eb
         </Pressable>
         </View>
 
@@ -225,32 +231,93 @@ export default function Home() {
           <Slider />
         </View>
 
+         {/* Latest products Section */}
+         <View style={styles.section}>  
+          <Text style={styles.sectionTitle}>Latest Products
+          <Pressable  onPress={() => router.push('login')}>
+          <Text style={styles.see}>see more {'>>'}</Text>
+          </Pressable>        
+          </Text> 
+          <FlatList
+            data={filteredLatest}
+            renderItem={renderProduct}
+            keyExtractor={(item) => item.id}
+            horizontal={true}
+            ListEmptyComponent={
+              <Text style={styles.emptyText}>No Products found</Text>
+            }
+          />
+        </View>
+
+         {/* Most popular products Section */}
+         <View style={styles.section}>  
+          <Text style={styles.sectionTitle}>Most Popular
+          <Pressable  onPress={() => router.push('login')}>
+          <Text style={styles.see}>see more {'>>'}</Text>
+          </Pressable>        
+          </Text> 
+          <FlatList
+            data={filteredPopular}
+            renderItem={renderProduct}
+            keyExtractor={(item) => item.id}
+            horizontal={true}
+            ListEmptyComponent={
+              <Text style={styles.emptyText}>No Products found</Text>
+            }
+          />
+        </View>
+
         {/* Laptops Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Laptops</Text>
+          <Text style={styles.sectionTitle}>Laptops 
+          <Pressable  onPress={() => router.push('login')}>
+          <Text style={styles.see}>see more {'>>'} </Text>
+          </Pressable>        
+          </Text>  
           <FlatList
             data={filteredLaptops}
             horizontal={true}
             renderItem={renderProduct}
             keyExtractor={(item) => item.id}
-            // horizontal={false} // Vertical orientation
-            // numColumns={2}
             ListEmptyComponent={
-            <Text style={styles.emptyText}>No laptops found</Text>
+            <Text style={styles.emptyText}>No Products found</Text>
             }
           />
         </View>
 
         {/* Phones Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Phones</Text>
+        <View style={styles.section}>  
+          <Text style={styles.sectionTitle}>Phones
+          <Pressable  onPress={() => router.push('login')}>
+          <Text style={styles.see}>see more {'>>'}</Text>
+          </Pressable>        
+          </Text> 
           <FlatList
             data={filteredPhones}
             renderItem={renderProduct}
             keyExtractor={(item) => item.id}
-            numColumns={2}
+            horizontal={true}
             ListEmptyComponent={
-              <Text style={styles.emptyText}>No phones found</Text>
+              <Text style={styles.emptyText}>No Products found</Text>
+            }
+          />
+        </View>
+
+
+         {/* Accessories Section */}
+         <View style={styles.section}>  
+          <Text style={styles.sectionTitle}>Accessories
+          <Pressable  onPress={() => router.push('login')}>
+          <Text style={styles.see}>see more {'>>'}</Text>
+          </Pressable>        
+          </Text> 
+          <FlatList
+            data={filteredAccessories}
+            renderItem={renderProduct}
+            keyExtractor={(item) => item.id}
+            horizontal={true}
+            ListEmptyComponent={
+              <Text style={styles.emptyText}>No Products found</Text>
             }
           />
         </View>
@@ -289,10 +356,6 @@ const styles = StyleSheet.create({
   },
   slider: {
     marginBottom: 20,
-    borderColor: '#0a4a7c',
-    borderWidth: 1,
-    alignSelf: 'center',
-    maxHeight: '20.15%',
   },
   section: {
     marginBottom: 20,
@@ -316,6 +379,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 18,
     color: '#666',
+    alignSelf: 'center',
   },
   cardButton: {
     marginLeft: 10,
@@ -333,4 +397,10 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#666',
   },
+  see : {
+    color: "#0a4a7c", 
+    textDecorationLine: 'underline', 
+    fontSize: 12,
+
+    },
 });

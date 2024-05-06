@@ -3,10 +3,12 @@ import { StyleSheet, Text, View, FlatList, Image, TouchableOpacity, Pressable } 
 import { db } from '../firebase'; 
 import { collection, query, where, onSnapshot, deleteDoc, getDocs, getDoc, doc } from 'firebase/firestore';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { useRouter } from 'expo-router';
 
 export default function Cart() {
   const [cartItems, setCartItems] = useState([]);
   const [userId, setUserId] = useState(null);
+  const router = useRouter();
 
   useEffect(() => {
     const auth = getAuth();

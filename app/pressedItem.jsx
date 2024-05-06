@@ -54,11 +54,12 @@ const styles = StyleSheet.create({
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'flex-start',
-      paddingHorizontal: 20,
       paddingVertical: 50,
+      width: "100%",
     },
     textContainer: {
       marginTop: '10%',
+      paddingHorizontal: 20 ,
     },
     name: {
       fontSize: 25,
@@ -69,7 +70,7 @@ const styles = StyleSheet.create({
       color: '#888',
     },
     image: {
-      width: 300,
+      width: "100%",
       height: 300,
       borderRadius: 10,
       marginLeft: 'auto',

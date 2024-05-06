@@ -65,8 +65,6 @@ const Login = () => {
   };
 
   return (
-    // <ImageBackground source={back}  style={styles.background1} >
-    // <Image source= {logo} resizeMode="contain" style={styles.logo}/>
     <View style={styles.container}>
       <Text style={styles.title}>Login</Text>
       <TextInput
@@ -88,7 +86,7 @@ const Login = () => {
       <Text style={styles.link}>
         Don't have an account ? <Link href={"./signup"} style={styles.SignUp}>Sign Up</Link>
       </Text>
-      <Text style={styles.link}>
+      <Text >
         <Link href={"./forgotPassword"} style={styles.SignUp}>Forgot Password?</Link>
       </Text>
       {errors && <CustomAlert message={errors} />}
@@ -100,15 +98,9 @@ const Login = () => {
 export default Login;
 
 const styles = StyleSheet.create({
-  background1 : {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-
-  },
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor : "lightgray",
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 20,
@@ -117,25 +109,25 @@ const styles = StyleSheet.create({
     fontSize: 70, 
     marginBottom: 40, 
     fontWeight: 'bold',
-    color: 'black', 
+    color: "#0a4a7c",
   },
   input: {
-    width: 350,
+    width: '100%',
     height: 55, 
-    backgroundColor: 'white',
-    borderColor: '#CBD5E1', 
+    backgroundColor: 'white', 
+    borderColor: "#0a4a7c", 
     borderWidth: 1,
     borderRadius: 10, 
     marginBottom: 25,  
     paddingHorizontal: 15, 
   },
   SignUp: {
-    color: 'blue', 
+    color: "#0a4a7c", 
     textDecorationLine: 'underline', 
-    fontSize: 20, 
+    fontSize: 20,  
   },
   button: {
-    backgroundColor: '#3B82F6',  
+    backgroundColor: "#0a4a7c",  
     paddingVertical: 14, 
     paddingHorizontal: 60, 
     borderRadius: 10, 
@@ -146,9 +138,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold', 
   },
   link: {
-    marginTop: 15, 
+    margin: 15, 
     fontSize: 18, 
-    color: 'black',  
+    color: '#000',  
   },
   alertContainer: {
     backgroundColor: '#FEE2E2',

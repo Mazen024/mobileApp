@@ -31,7 +31,7 @@ const ForgotPassword = () => {
       <Text style={styles.link}>
         Remember your password?{" "}
         <Link href={"./login"} style={styles.Login}>
-          Log in
+          Login
         </Link>
       </Text>
     </View>
@@ -41,34 +41,39 @@ const ForgotPassword = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor : "lightgray",
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 20,
   },
   title: {
-    fontSize: 32,
-    marginBottom: 30,
-    fontWeight: "bold",
+    fontSize: 70, 
+    marginBottom: 40, 
+    fontWeight: 'bold',
+    color: "#0a4a7c", 
+    textAlign : "center",
   },
   input: {
-    width: "100%",
-    height: 40,
-    borderColor: "gray",
+    width: '100%',
+    height: 55, 
+    backgroundColor: 'white', 
+    borderColor: "#0a4a7c", 
     borderWidth: 1,
-    borderRadius: 5,
-    marginBottom: 20,
-    paddingHorizontal: 10,
+    borderRadius: 10, 
+    marginBottom: 25,  
+    paddingHorizontal: 15, 
   },
-  Login: {
-    color: "blue",
-    textDecorationLine: "underline",
+  Login : {
+    color: "#0a4a7c", 
+    textDecorationLine: 'underline', 
+    fontSize: 20,  
   },
   button: {
-    backgroundColor: "blue",
-    paddingVertical: 12,
-    paddingHorizontal: 50,
-    borderRadius: 5,
-    marginBottom: 20,
+    backgroundColor: "#0a4a7c",  
+    paddingVertical: 14, 
+    paddingHorizontal: 60, 
+    borderRadius: 10, 
+    marginBottom: 25, 
   },
   buttonText: {
     color: "white",
@@ -76,8 +81,9 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   link: {
-    marginTop: 10,
-    fontSize: 14,
+    margin: 15, 
+    fontSize: 18, 
+    color: '#000',  
   },
 });
 

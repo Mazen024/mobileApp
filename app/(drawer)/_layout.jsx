@@ -45,37 +45,28 @@ const CustomDrawerContent = (props) => {
   }, []);
 
   return (
-<<<<<<< HEAD
-    <DrawerContentScrollView style={styles.screenOptions} {...props}>
-=======
     <DrawerContentScrollView {...props} 
-<<<<<<< HEAD
     style = {{backgroundColor : '#fff' }}>
-=======
-    style = {{backgroundColor : '#fff' , borderRadius : 20}}>
->>>>>>> ea43630eb0a8c024e13568fc8996184622c23b7e
->>>>>>> d723de6c85890613f386087c42fd1bad7ffeb2eb
       <View >
         {user ? (
           <View style={styles.userInfoWrapper}>
             <Image
               source={{uri : profileImage}}
-              width={90}
-              height={90}
+              width={80}
+              height={80}
               style={styles.userImg}
             />
-          <View style={styles.userName}>
-            <Text style={styles.user}> Welcome </Text>
-            <Text style={styles.user}> {user.name} </Text>
+          <View >
+          <Text style={styles.userName}>Welcome! </Text>
+          <Text style={styles.userName}>{user.name}</Text>
           </View>
         </View>
         ): (
-        <View style={styles.signInPrompt}>
-            <Text style={styles.promptText}>You need to sign in</Text>
-            <Pressable style={styles.signInButton} onPress={() => router.push('login')}>
-              <Ionicons name="log-in-outline" size={30}/>
-              <Text style={styles.signInButtonText}>Sign In</Text>
-            </Pressable>
+          <View style={styles.signInPrompt}>
+          <Text style={styles.promptText}>You need to sign in</Text>
+          <Pressable style={styles.signInButton} onPress={() => router.push('login')}>
+            <Text style={styles.signInButtonText}>Sign In</Text>
+          </Pressable>
         </View>
         )
         }
@@ -143,8 +134,6 @@ export default function Layout() {
     <Drawer drawerContent={(props) => <CustomDrawerContent {...props} />} 
     screenOptions={{headerShown: false}}
     >
-      {/* <Drawer.Screen name="favorite" options={{headerShown: true}} /> */}
-      {/* <Drawer.Screen name="settings" options={{headerShown: true}} /> */}
     </Drawer>
   );
 }
@@ -177,11 +166,7 @@ const styles = StyleSheet.create({
     marginLeft: -20,
     fontSize: 18,
   },
-  screenOptions:{
-    backgroundColor: 'white',
-  },
   userInfoWrapper: {
-    backgroundColor: 'white',
     flexDirection: "row",
     paddingHorizontal: 10,
     paddingVertical: 20,
@@ -191,37 +176,15 @@ const styles = StyleSheet.create({
   },
   userImg: {
     borderRadius: 40,
-    resizeMode: 'contain'
   },
   userDetailsWrapper: {
     marginTop: 25,
     marginLeft: 10,
   },
   userName: {
-    flex:1,
-    flexDirection: 'column',
-    paddingHorizontal: "10%",
-    paddingVertical: "5%",
-  },
-  user: {
     fontSize: 20,
     fontWeight: 'bold',
-  },
-  promptText:{
-    fontWeight: 'bold',
-    fontSize: 20,
-  },
-  signInButton:{
-    flexDirection: 'row',
-    backgroundColor: 'rgba(22, 22, 22, 0.2)',
-    width: '50%',
-    paddingVertical: 12,
-    borderRadius: 8,
-    textAlign: 'center',
-  },
-  signInButtonText:{
-    color: 'black',
-    fontWeight: 'bold',
-    fontSize: 18,
+    marginLeft: 15,
+
   },
 });
