@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
   link: {
     margin: 15, 
     fontSize: 18, 
-    color: '#000',  
+    color: '#3a3a3c',  
   },
   alertContainer: {
     backgroundColor: '#FEE2E2',

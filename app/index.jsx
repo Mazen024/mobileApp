@@ -1,82 +1,111 @@
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack, useRouter } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { useEffect, useState } from 'react';
-import { useColorScheme } from 'react-native';
+import React, { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Slot } from 'expo-router'; 
-export { ErrorBoundary } from 'expo-router';
+import { View, Text, ImageBackground, StyleSheet, TouchableOpacity, Image, Pressable , ActivityIndicator} from 'react-native';
+import { Link, useRouter } from 'expo-router';
+import logo from '../assets/images/logo.png';
+import { Ionicons } from '@expo/vector-icons';
 
-export const unstable_settings = {
-  initialRouteName: '(tabs)',
-};
-
-SplashScreen.preventAutoHideAsync();
-
-export default function index() {
-  const [loaded, error] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-    ...FontAwesome.font,
-  });
-
-  const [isFirstTime, setIsFirstTime] = useState(null);
-  const router = useRouter(); 
-
-  useEffect(() => {
-    const checkFirstTime = async () => {
-      try {
-        const firstTimeFlag = await AsyncStorage.getItem('isFirstTime');
-        setIsFirstTime(firstTimeFlag === null); 
-      } catch (error) {
-        console.error('Error reading first-time flag:', error);
-      }
-    };
-
-    checkFirstTime();
-  }, []);
-
-  useEffect(() => {
-    if (isFirstTime !== null && loaded) {
-      if (isFirstTime) {
-        router.replace('/index'); 
-        AsyncStorage.setItem('isFirstTime', 'false'); 
-      } else {
-        router.replace('/Home');
-      }
-    }
-  }, [isFirstTime, router, loaded]);
-
-  useEffect(() => {
-    if (error) {
-      throw error; 
-    }
-  }, [error]);
-
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync(); 
-    }
-  }, [loaded]);
-
-  if (!loaded || isFirstTime === null) { // Wait until the check is complete
-    return null; 
-  }
-
-  return <RootLayoutNav />; 
-}
-
-function RootLayoutNav() {
-  const colorScheme = useColorScheme(); 
+const Welcome = () => {
+  const router = useRouter();
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack screenOptions={{ headerShown: false }}>
-        {/* Define the possible screens */}
-        <Slot name="index"  />
-        <Slot name="Home"  />
-      </Stack>
-    </ThemeProvider>
+    <View style={styles.container}>
+        <View style={styles.container1}>
+          <TouchableOpacity onPress={() => router.push('/Home')}>
+          <Ionicons name="close" size={30} style={styles.Icon}/>              
+          </TouchableOpacity>
+          <View style={styles.logoc}>
+          <Image source= {logo} resizeMode="contain" style={styles.logo} />
+
+          <Text style={styles.welcomeText}>Welcome to Our App!</Text>
+          <Text style={styles.instructions}>We're glad you're here. Click the button below to continue.</Text>
+          </View>
+
+            <View>
+              <Pressable onPress={() =>router.push('/login')}
+                style={styles.btn} > 
+                <Text style = {styles.bodyText}>Login</Text>
+                
+              </Pressable>
+            </View>
+
+            <Text style={styles.link}> Don't have an account ? 
+            <Link href={"./signup"} style={styles.SignUp}>Sign Up</Link>
+            </Text>
+            </View>
+        </View>
   );
-}
+};
+
+const styles = StyleSheet.create({
+  welcomeText: {
+    fontSize: 30,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 10 ,
+    color : "#3a3a3c" ,
+  },
+  instructions: {
+    fontWeight: 'bold',
+    fontSize: 20,
+    textAlign: 'center',
+    color: "#0a4a7c", 
+  },
+  link: {
+    margin: 15, 
+    fontSize: 22, 
+    color: '#3a3a3c',  
+  },
+  SignUp: {
+    color: "#0a4a7c", 
+    textDecorationLine: 'underline', 
+    fontSize: 22,  
+  },
+  container: {
+    flex: 1,
+    backgroundColor : "lightgray",
+    padding: 20,
+  },
+  container1: {
+    backgroundColor : "lightgray",
+  },
+  logo: {
+    width: '100%',
+    height: "70%", 
+    marginBottom: 20 ,
+  },
+  logoc: {
+    width: '100%',
+    height: "70%", 
+  },
+  Icon: {
+    textAlign :  'right',
+    width: '100%' ,
+    margin : 10 ,
+    marginBottom : 20 , 
+  },
+  btn: {
+    width: '100%' ,
+    backgroundColor: 'lightgray',
+    borderColor : "#0a4a7c",
+    paddingBottom: 16,
+    padding: 10,
+    borderWidth: 2,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  bodyText: {
+    color: "#3a3a3c" , 
+    fontSize: 30,
+    fontWeight: 'bold', 
+  },
+  signUpText: {
+    color: "#0a4a7c", 
+    textDecorationLine: 'underline', 
+    fontSize: 20,  
+    marginRight : 10 ,
+  },
+});
+
+export default Welcome;
+
