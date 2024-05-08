@@ -111,7 +111,7 @@ const Profile = () => {
     try {
       const userId = user.userId;
       if (!userId) {
-        console.error('User ID is undefined');
+        Alert.alert('User ID is undefined');
         return;
       }
 

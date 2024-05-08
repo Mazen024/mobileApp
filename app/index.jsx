@@ -1,111 +1,39 @@
-import React, { useEffect, useState } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { View, Text, ImageBackground, StyleSheet, TouchableOpacity, Image, Pressable , ActivityIndicator} from 'react-native';
-import { Link, useRouter } from 'expo-router';
-import logo from '../assets/images/logo.png';
-import { Ionicons } from '@expo/vector-icons';
+import React, { useState, useEffect } from 'react';
+import Welcome from './welcome';
+import Home from './(drawer)/(tabs)/Home';
+import { getItemFor, storeData } from './isFirstTime';
+import {  Link } from 'expo-router';
 
-const Welcome = () => {
-  const router = useRouter();
+const HAS_LAUNCHED = 'HAS_LAUNCHED';
 
-  return (
-    <View style={styles.container}>
-        <View style={styles.container1}>
-          <TouchableOpacity onPress={() => router.push('/Home')}>
-          <Ionicons name="close" size={30} style={styles.Icon}/>              
-          </TouchableOpacity>
-          <View style={styles.logoc}>
-          <Image source= {logo} resizeMode="contain" style={styles.logo} />
+const Index = () => {
+  const [hasLaunched, setHasLaunched] = useState(null);
 
-          <Text style={styles.welcomeText}>Welcome to Our App!</Text>
-          <Text style={styles.instructions}>We're glad you're here. Click the button below to continue.</Text>
-          </View>
+  useEffect(() => {
+    const checkFirstLaunch = async () => {
+      const hasLaunchedValue = await getItemFor(HAS_LAUNCHED);
+      if (hasLaunchedValue) {
+        setHasLaunched(true);
+      } else {
+        await storeData(HAS_LAUNCHED, 'true');
+        setHasLaunched(false);
+      }
+    };
 
-            <View>
-              <Pressable onPress={() =>router.push('/login')}
-                style={styles.btn} > 
-                <Text style = {styles.bodyText}>Login</Text>
-                
-              </Pressable>
-            </View>
+    checkFirstLaunch().catch((error) => {
+      console.error(error);
+    });
+  }, []);
 
-            <Text style={styles.link}> Don't have an account ? 
-            <Link href={"./signup"} style={styles.SignUp}>Sign Up</Link>
-            </Text>
-            </View>
-        </View>
-  );
+  if (hasLaunched === null) {
+    return null;
+  }
+
+  return <>{hasLaunched ? 
+    <Link href={'/Home'}/>
+    // <Home />
+   :
+    <Welcome />}</>;
 };
 
-const styles = StyleSheet.create({
-  welcomeText: {
-    fontSize: 30,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 10 ,
-    color : "#3a3a3c" ,
-  },
-  instructions: {
-    fontWeight: 'bold',
-    fontSize: 20,
-    textAlign: 'center',
-    color: "#0a4a7c", 
-  },
-  link: {
-    margin: 15, 
-    fontSize: 22, 
-    color: '#3a3a3c',  
-  },
-  SignUp: {
-    color: "#0a4a7c", 
-    textDecorationLine: 'underline', 
-    fontSize: 22,  
-  },
-  container: {
-    flex: 1,
-    backgroundColor : "lightgray",
-    padding: 20,
-  },
-  container1: {
-    backgroundColor : "lightgray",
-  },
-  logo: {
-    width: '100%',
-    height: "70%", 
-    marginBottom: 20 ,
-  },
-  logoc: {
-    width: '100%',
-    height: "70%", 
-  },
-  Icon: {
-    textAlign :  'right',
-    width: '100%' ,
-    margin : 10 ,
-    marginBottom : 20 , 
-  },
-  btn: {
-    width: '100%' ,
-    backgroundColor: 'lightgray',
-    borderColor : "#0a4a7c",
-    paddingBottom: 16,
-    padding: 10,
-    borderWidth: 2,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  bodyText: {
-    color: "#3a3a3c" , 
-    fontSize: 30,
-    fontWeight: 'bold', 
-  },
-  signUpText: {
-    color: "#0a4a7c", 
-    textDecorationLine: 'underline', 
-    fontSize: 20,  
-    marginRight : 10 ,
-  },
-});
-
-export default Welcome;
-
+export default Index;
