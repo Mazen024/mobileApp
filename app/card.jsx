@@ -74,7 +74,7 @@ export default function Cart() {
           </View>
         }
       />
-      <Pressable onPress={() => router.push('CheckOut', { cartItems })}>
+      <Pressable onPress={() => router.push('CheckOut')}>
         <Text style={styles.footer}>Check Out</Text>
       </Pressable>
     </View>

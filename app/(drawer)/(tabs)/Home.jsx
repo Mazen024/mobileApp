@@ -235,7 +235,7 @@ export default function Home() {
          <View style={styles.section}>  
           <Text style={styles.sectionTitle}>Latest Products
           <Pressable  onPress={() => router.push('login')}>
-          <Text style={styles.see}>see more {'>>'}</Text>
+            <Text style={styles.see}>see more {'>>'}</Text>
           </Pressable>        
           </Text> 
           <FlatList
