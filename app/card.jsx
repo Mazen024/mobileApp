@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, FlatList, Image, TouchableOpacity, Pressable } from 'react-native';
 import { db } from '../firebase'; 
-import { collection, query, where, onSnapshot, deleteDoc, getDocs, getDoc, doc } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, deleteDoc, getDocs, getDoc, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { useRouter } from 'expo-router';
 
@@ -53,6 +53,33 @@ export default function Cart() {
     }
   };
 
+  const handleCheckOut = async () => {
+    try {
+      const checkoutTime = serverTimestamp(); // Timestamp of the checkout time
+
+      for (const item of cartItems) {
+        const cartItemRef = doc(db, 'Cart', item.id);
+        await updateDoc(cartItemRef, {
+          quantity: item.quantity,
+          checkoutTime: checkoutTime // Add checkout time to each cart item
+        });
+      }
+      router.push('CheckOut');
+    } catch (error) {
+      console.error('Error updating cart items during checkout:', error);
+    }
+  };
+
+  const updateCartItemQuantity = (productId, newQuantity) => {
+    const updatedCartItems = cartItems.map(item => {
+      if (item.productId === productId) {
+        return { ...item, quantity: newQuantity };
+      }
+      return item;
+    });
+    setCartItems(updatedCartItems);
+  };
+
   return (
     <View style={styles.container}>
       <Text></Text>
@@ -64,6 +91,7 @@ export default function Cart() {
             productId={item.productId}
             quantity={item.quantity}
             onRemove={() => removeCartItem(item.productId)}
+            onUpdateQuantity={(newQuantity) => updateCartItemQuantity(item.productId, newQuantity)}
           />
         )}
         keyExtractor={(item) => item.productId}
@@ -74,15 +102,16 @@ export default function Cart() {
           </View>
         }
       />
-      <Pressable onPress={() => router.push('CheckOut')}>
+      <Pressable onPress={handleCheckOut}>
         <Text style={styles.footer}>Check Out</Text>
       </Pressable>
     </View>
   );
 }
 
-function CartItem({ productId, quantity, onRemove }) {
+function CartItem({ productId, quantity, onRemove, onUpdateQuantity }) {
   const [product, setProduct] = useState(null);
+  const [itemQuantity, setItemQuantity] = useState(quantity);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -103,6 +132,20 @@ function CartItem({ productId, quantity, onRemove }) {
     fetchProduct();
   }, [productId]);
 
+  const increaseQuantity = () => {
+    const newQuantity = itemQuantity + 1;
+    setItemQuantity(newQuantity);
+    onUpdateQuantity(newQuantity); // Update the quantity in the parent component
+  };
+
+  const decreaseQuantity = () => {
+    if (itemQuantity > 1) {
+      const newQuantity = itemQuantity - 1;
+      setItemQuantity(newQuantity);
+      onUpdateQuantity(newQuantity); // Update the quantity in the parent component
+    }
+  };
+
   if (!product) {
     return null;
   }
@@ -113,7 +156,15 @@ function CartItem({ productId, quantity, onRemove }) {
       <View style={styles.itemDetails}>
         <Text style={styles.productName}>{product.name}</Text>
         <Text style={styles.price}>Price: ${product.price}</Text>
-        <Text style={styles.quantity}>Quantity: {quantity}</Text>
+        <View style={styles.quantityContainer}>
+          <TouchableOpacity onPress={decreaseQuantity}>
+            <Text style={styles.quantityButton}>-</Text>
+          </TouchableOpacity>
+          <Text style={styles.quantity}>{itemQuantity}</Text>
+          <TouchableOpacity onPress={increaseQuantity}>
+            <Text style={styles.quantityButton}>+</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
@@ -189,5 +240,15 @@ const styles = StyleSheet.create({
   deleteButtonText: {
     color: 'white',
     fontWeight: 'bold',
+  },
+  quantityContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  quantityButton: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    paddingHorizontal: 10,
+    color: 'blue',
   },
 });

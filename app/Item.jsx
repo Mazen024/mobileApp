@@ -111,12 +111,10 @@ export default function Item({ name, price, image, productId }) {
       const cartSnapshot = await getDocs(cartQuery);
 
       if (!cartSnapshot.empty) {
-        // Remove from cart
         const cartDoc = cartSnapshot.docs[0];
         await deleteDoc(cartDoc.ref);
         setAddedToCart((prev) => ({ ...prev, [productId]: false }));
       } else {
-        // Add to cart
         const data = {
           userId,
           productId,
@@ -126,7 +124,6 @@ export default function Item({ name, price, image, productId }) {
         setAddedToCart((prev) => ({ ...prev, [productId]: true }));
       }
 
-      console.log('Toggled ${productId} in the cart');
     } catch (error) {
       console.error('Error toggling cart:', error);
     }

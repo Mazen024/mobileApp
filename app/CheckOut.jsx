@@ -1,36 +1,42 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, FlatList, Image } from 'react-native';
-import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
+import { StyleSheet, View, Text, FlatList, Image, Pressable, Alert, TextInput } from 'react-native';
+import { collection, query, where, getDocs, doc, getDoc, addDoc, Timestamp, deleteDoc } from 'firebase/firestore';
 import { db } from '../firebase'; 
-import { getAuth, onAuthStateChanged } from 'firebase/auth'; // Import Firebase auth methods
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { useRouter } from 'expo-router'; // Import router from Expo
 
 const Checkout = () => {
     const [cartItems, setCartItems] = useState([]);
     const [userEmail, setUserEmail] = useState('');
     const [userName, setUserName] = useState('');
-    const [userId, setUserId] = useState(null); // State to hold userId
-
+    const [userPhone, setUserPhone] = useState('');
+    const [userId, setUserId] = useState(null);
+    const [address, setAddress] = useState('');
+    const router = useRouter();
+    const [totalPrice, setTotalPrice] = useState(0);
     useEffect(() => {
-        const auth = getAuth(); // Get Firebase auth instance
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
+        const auth = getAuth();
+        const unsubscribe = onAuthStateChanged(auth, async (user) => {
             if (user) {
-                // If user is authenticated, set userId state
-                setUserId(user.uid);
+                const userId = user.uid;
+                setUserId(userId);
+                await fetchCartAndUserData(userId);
             } else {
-                // If no user is authenticated, set userId state to null
                 setUserId(null);
             }
         });
+    
         return () => unsubscribe();
     }, []);
-
-    useEffect(() => {
+    
+    const fetchCartAndUserData = async (userId) => {
         if (userId) {
-            fetchCartData(userId); // Fetch cart data only if userId is available
-            fetchUserData(userId); // Fetch user data only if userId is available
+            const [cartItems, userData] = await Promise.all([fetchCartData(userId), fetchUserData(userId)]);
+            setCartItems(cartItems);
+            calculateTotalPrice(cartItems);
         }
-    }, [userId]); // Run this effect whenever userId changes
-
+    };
+    
     const fetchCartData = async (userId) => {
         const cartQuery = query(collection(db, 'Cart'), where('userId', '==', userId));
         const cartSnapshot = await getDocs(cartQuery);
@@ -46,12 +52,13 @@ const Checkout = () => {
                     price: productData.price,
                     image: productData.imageUrl,
                     userId: cartData.userId,
+                    quantity: cartData.quantity,
                 });
             }
         }
-        setCartItems(items);
+        return items;
     };
-
+    
     const fetchUserData = async (userId) => {
         const usersQuery = query(collection(db, 'users'), where('userId', '==', userId));
         const userSnapshot = await getDocs(usersQuery);
@@ -59,11 +66,67 @@ const Checkout = () => {
             const userData = userSnapshot.docs[0].data();
             setUserEmail(userData.email || '');
             setUserName(userData.name || '');
+            setUserPhone(userData.Phone || '');
+            return userData;
         }
+    };
+    
+    const calculateTotalPrice = (cartItems) => {
+        let total = 0;
+        cartItems.forEach(item => {
+            total += item.price * item.quantity;
+        });
+        setTotalPrice(total);
+    };
+
+    const handleConfirm = async () => {
+        // Show an alert with the confirmation message
+        Alert.alert(
+            'Confirm Order',
+            'The products will be delivered. Proceed?',
+            [
+                {
+                    text: 'Cancel',
+                    onPress: () => console.log('Cancel pressed'),
+                    style: 'cancel'
+                },
+                {
+                    text: 'OK',
+                    onPress: async () => {
+                        try {
+                            const salesRef = collection(db, 'Sales');
+                            const timestamp = Timestamp.now();
+                            for (const item of cartItems) {
+                                await addDoc(salesRef, {
+                                    userId: userId,
+                                    userName: userName,
+                                    userEmail: userEmail,
+                                    userPhone: userPhone, // Include phone number
+                                    address: address,
+                                    productName: item.name,
+                                    price: item.price,
+                                    quantity: item.quantity,
+                                    imageUrl: item.image,
+                                    timestamp: timestamp,
+                                });
+                            }
+                            const cartQuery = query(collection(db, 'Cart'), where('userId', '==', userId));
+                            const cartSnapshot = await getDocs(cartQuery);
+                            for (const doc of cartSnapshot.docs) {
+                                await deleteDoc(doc.ref);
+                            }
+                            router.back();
+                        } catch (error) {
+                            console.error('Error creating sales record:', error);
+                        }
+                    }
+                }
+            ],
+            { cancelable: false }
+        );
     };
 
     return (
-        console.log(cartItems),
         <View style={styles.container}>
             <Text style={styles.title}>Checkout</Text>
             <View style={styles.userInfoContainer}>
@@ -71,6 +134,17 @@ const Checkout = () => {
                 <Text style={styles.userInfoText}>{userEmail}</Text>
                 <Text style={styles.userInfoLabel}>Name:</Text>
                 <Text style={styles.userInfoText}>{userName}</Text>
+                <Text style={styles.userInfoLabel}>Phone:</Text>
+                <Text style={styles.userInfoText}>{userPhone}</Text>
+                <TextInput
+                    style={styles.input}
+                    placeholder="Enter your address"
+                    onChangeText={setAddress}
+                    value={address}
+                />
+            </View>
+            <View style={{ alignItems: 'center', paddingBottom: 10 }}>
+                <Text style={{ fontSize: 20, fontWeight: 'bold', color: 'red' }}>Whole Price : {totalPrice} EGY</Text>
             </View>
             <FlatList
                 style={styles.productList}
@@ -79,11 +153,20 @@ const Checkout = () => {
                     <View style={styles.productItem}>
                         <Text>{item.name}</Text>
                         <Text>{item.price} EGY</Text>
+                        <Text>Quantity : {item.quantity}</Text>
                         <Image source={{ uri: item.image }} style={styles.image} />
                     </View>
                 )}
                 keyExtractor={(item) => item.id}
             />
+            <View style={styles.buttonContainer}>
+                <Pressable onPress={() => router.replace('Cart')}>
+                    <Text style={styles.cancelButton}>Cancel</Text>
+                </Pressable>
+                <Pressable onPress={handleConfirm}>
+                    <Text style={styles.confirmButton}>Confirm</Text>
+                </Pressable>
+            </View>
         </View>
     );
 }
@@ -95,6 +178,7 @@ const styles = StyleSheet.create({
         padding: 20,
     },
     title: {
+        paddingTop: 10,
         fontSize: 18,
         fontWeight: 'bold',
         marginBottom: 20,
@@ -106,7 +190,7 @@ const styles = StyleSheet.create({
         marginLeft: 'auto',
         marginBottom: 'auto',
         resizeMode: 'contain'
-      },
+    },
     userInfoContainer: {
         backgroundColor: '#f0f0f0',
         borderRadius: 10,
@@ -122,6 +206,13 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         fontSize: 16,
     },
+    input: {
+        height: 40,
+        borderColor: 'gray',
+        borderWidth: 1,
+        marginBottom: 10,
+        paddingHorizontal: 10,
+    },
     productList: {
         flexGrow: 1,
     },
@@ -129,6 +220,29 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         borderBottomWidth: 1,
         borderBottomColor: '#ccc',
+    },
+    buttonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginTop: 20,
+    },
+    confirmButton: {
+        backgroundColor: 'green',
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 5,
+        textAlign: 'center',
+        color: 'white',
+        fontWeight: 'bold',
+    },
+    cancelButton: {
+        backgroundColor: 'red',
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 5,
+        textAlign: 'center',
+        color: 'white',
+        fontWeight: 'bold',
     },
 });
 
