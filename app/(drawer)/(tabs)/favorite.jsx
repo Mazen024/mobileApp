@@ -10,25 +10,26 @@ export default function favorite() {
 
   useEffect(() => {
     const auth = getAuth();
-    const unsubscribe = onAuthStateChanged(auth, async (authenticatedUser) => {
+
+    const unsubscribeAuth = onAuthStateChanged(auth, (authenticatedUser) => {
       setUserId(authenticatedUser ? authenticatedUser.uid : null);
     });
-
-    return () => unsubscribe();
-  }, []);
-
-  useEffect(() => {
+    let unsubscribeFavorites = null; 
     if (userId) {
-      const q = query(collection(db, 'Favorites'), where('userId', '==', userId));
-      const unsubscribe = onSnapshot(q, (snapshot) => {
-        const items = snapshot.docs.map((doc) => ({
+      const favoritesQuery = query(collection(db, 'Favorites'), where('userId', '==', userId));
+      unsubscribeFavorites = onSnapshot(favoritesQuery, (snapshot) => {
+        const favorites = snapshot.docs.map((doc) => ({
           productId: doc.data().productId,
         }));
-        setFavoriteItems(items);
+        setFavoriteItems(favorites); 
       });
-
-      return () => unsubscribe();
     }
+    return () => {
+      unsubscribeAuth(); 
+      if (unsubscribeFavorites) {
+        unsubscribeFavorites(); 
+      }
+    };
   }, [userId]);
 
   const removeFavorite = async (productId) => {

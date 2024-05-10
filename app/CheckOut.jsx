@@ -3,7 +3,7 @@ import { StyleSheet, View, Text, FlatList, Image, Pressable, Alert, TextInput } 
 import { collection, query, where, getDocs, doc, getDoc, addDoc, Timestamp, deleteDoc } from 'firebase/firestore';
 import { db } from '../firebase'; 
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { useRouter } from 'expo-router'; // Import router from Expo
+import { useRouter } from 'expo-router'; 
 
 const Checkout = () => {
     const [cartItems, setCartItems] = useState([]);
@@ -80,7 +80,6 @@ const Checkout = () => {
     };
 
     const handleConfirm = async () => {
-        // Show an alert with the confirmation message
         Alert.alert(
             'Confirm Order',
             'The products will be delivered. Proceed?',

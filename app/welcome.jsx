@@ -3,7 +3,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { View, Text, ImageBackground, StyleSheet, TouchableOpacity, Image, Pressable , ActivityIndicator} from 'react-native';
 import { Link, useRouter } from 'expo-router';
 import logo from '../assets/images/logo.png';
-import { Ionicons } from '@expo/vector-icons';
 
 const Welcome = () => {
   const router = useRouter();
@@ -13,7 +12,6 @@ const Welcome = () => {
         <View style={styles.container1}>
           <TouchableOpacity onPress={() => router.push('/Home')}>
             <Text style={styles.Icon}> Skip </Text>
-            {/* <Ionicons name="close" size={30} style={styles.Icon}/>               */}
           </TouchableOpacity>
           <View style={styles.logoc}>
           <Image source= {logo} resizeMode="contain" style={styles.logo} />

@@ -7,7 +7,6 @@ export { ErrorBoundary } from 'expo-router';
 import {useColorScheme} from 'react-native'
 import { useEffect } from 'react';
 
-
 export const unstable_settings = {
   initialRouteName: '(tabs)', 
 };

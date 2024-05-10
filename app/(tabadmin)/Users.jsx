@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Text, View, StyleSheet, SafeAreaView, FlatList, Pressable, TextInput } from 'react-native';
-import { getDocs, collection, onSnapshot, deleteDoc } from 'firebase/firestore';
+import {  collection, onSnapshot, deleteDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
-import { Ionicons } from '@expo/vector-icons';
 
 export default function adminUsers() {
   const [users, setUsers] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-
+  
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, 'users'), (snapshot) => {
       const updatedUsers = snapshot.docs.map((doc) => ({
@@ -16,38 +15,14 @@ export default function adminUsers() {
         ...doc.data(),
       }));
       setUsers(updatedUsers);
+      const filterResults = updatedUsers.filter((item) =>
+        item.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredData(filterResults); 
     });
 
-    return () => unsubscribe();
-  }, []);
-
-  useEffect(() => {
-    const filterResults = users.filter((item) =>
-      item.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    setFilteredData(filterResults);
-  }, [searchTerm, users]);
-
-  // const handleDeleteUser = async (Admin) => {
-  //   try {
-  //     if ( Admin === true) {
-  //       alert('Admin user cannot be deleted by this way');
-  //       return;
-  //     }
-  //     const querySnapshot = await getDocs(collection(db, 'users'));
-  //     const userDoc = querySnapshot.docs.find(doc => doc.data().isAdmin === Admin);
-      
-  //     if (userDoc) {
-  //       await deleteDoc(userDoc.ref);
-  //       console.log('User deleted successfully');
-  //     } else {
-  //       console.log('User not found');
-  //     }
-  //   } catch (error) {
-  //     console.error('Error deleting user:', error);
-  //   }
-  // };
-  
+    return () => unsubscribe(); 
+  }, [searchTerm]); 
 
   return (
     <SafeAreaView style={styles.container}>

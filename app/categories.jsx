@@ -17,38 +17,32 @@ const CategoriesPage = () => {
   const router = useRouter();
 
   useEffect(() => {
-    const fetchCategoryItems = async () => {
+    const fetchAndFilterItems = async () => {
       try {
-        const q = query(collection(db, 'Products'), where('category', '==', category)); 
+        const q = query(collection(db, 'Products'), where('category', '==', category));
         const querySnapshot = await getDocs(q);
         
         const items = querySnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));
+
+        setCategoryItems(items); 
         
-        setCategoryItems(items);
-        setFilteredData(items); // Initialize filtered data with all category items
+        const results = searchTerm
+          ? items.filter((item) => item.name.toLowerCase().includes(searchTerm.toLowerCase()))
+          : items; 
+
+        setFilteredData(results); 
       } catch (error) {
-        console.error('Error fetching category items:', error);
+        console.error('Error fetching or filtering items:', error);
       } finally {
-        setIsLoading(false); // Data fetch is complete
+        setIsLoading(false);
       }
     };
 
-    fetchCategoryItems(); // Fetch category data on mount
-  }, [category]); 
-
-  useEffect(() => {
-    if (searchTerm) {
-      const results = categoryItems.filter((item) =>
-        item.name.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-      setFilteredData(results); // Update filtered data with search results
-    } else {
-      setFilteredData(categoryItems); // Reset filtered data when search term is empty
-    }
-  }, [searchTerm, categoryItems]); 
+    fetchAndFilterItems(); 
+  }, [category, searchTerm]); 
 
   if (isLoading) {
     return (

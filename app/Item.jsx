@@ -1,18 +1,15 @@
 import { router } from "expo-router";
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, Pressable, ActivityIndicator, StyleSheet , Image , Dimensions , ScrollView , SafeAreaView , TextInput} from 'react-native';
-import {addDoc,getDocs,where,query,collection,onSnapshot,deleteDoc,} from 'firebase/firestore';
+import { View, Text, Pressable, StyleSheet , Image} from 'react-native';
+import {addDoc,getDocs,where,query,collection,onSnapshot,deleteDoc} from 'firebase/firestore';
 import { db } from '../firebase';
 import { Ionicons } from '@expo/vector-icons';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
-
 export default function Item({ name, price, image, productId }) {
 
-  const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true); 
   const [data, setData] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
   const [filteredData, setFilteredData] = useState([]);
   const [userId, setUserId] = useState(null);
   const [favorites, setFavorites] = useState({});
@@ -21,54 +18,39 @@ export default function Item({ name, price, image, productId }) {
 
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(getAuth(), (user) => {
-      if (user) {
-        setUserId(user.uid);
-      } else {
-        setUserId(null);
-      }
+      setUserId(user ? user.uid : null);
     });
 
-    return () => unsubscribeAuth();
-  }, []);
-
-  useEffect(() => {
-    const unsubscribe = onSnapshot(collection(db, 'Products'), (snapshot) => {
+    const unsubscribeProducts = onSnapshot(collection(db, 'Products'), (snapshot) => {
       const fetchedData = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));
       setData(fetchedData);
       setFilteredData(fetchedData);
-      setLoading(false);
-      setProducts(fetchedData);
+      setLoading(false); 
     });
 
-    return () => unsubscribe();
-  }, []);
+    const unsubscribeFavorites = userId
+      ? onSnapshot(collection(db, 'Favorites'), (snapshot) => {
+          const favoritesData = snapshot.docs.reduce((acc, doc) => {
+            const data = doc.data();
+            if (data.userId === userId) {
+              acc[data.productId] = true; 
+            }
+            return acc;
+          }, {});
+          setFavorites(favoritesData);
+        })
+      : null;
 
-  useEffect(() => {
-    const filteredResults = data.filter((item) =>
-      item.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    setFilteredData(filteredResults);
-  }, [searchTerm, data]);
-
-  useEffect(() => {
-    if (userId) {
-      const favoriteQuery = collection(db, 'Favorites');
-      const unsubscribe = onSnapshot(favoriteQuery, (snapshot) => {
-        const favoritesData = snapshot.docs.reduce((acc, doc) => {
-          const data = doc.data();
-          if (data.userId === userId) {
-            acc[data.productId] = true;
-          }
-          return acc;
-        }, {});
-        setFavorites(favoritesData);
-      });
-
-      return () => unsubscribe();
-    }
+    return () => {
+      unsubscribeAuth(); 
+      unsubscribeProducts(); 
+      if (unsubscribeFavorites) {
+        unsubscribeFavorites();
+      }
+    };
   }, [userId]);
 
   const toggleFavorite = async (productId) => {

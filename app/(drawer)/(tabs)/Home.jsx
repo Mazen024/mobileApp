@@ -1,20 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import {Text,View,StyleSheet,SafeAreaView,FlatList,Pressable,TextInput,ScrollView,Dimensions,ActivityIndicator} from 'react-native';
-import {addDoc,getDocs,where,query,collection,onSnapshot,deleteDoc,} from 'firebase/firestore';
+import {collection,onSnapshot} from 'firebase/firestore';
 import { db } from '../../../firebase';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import Item from '../../Item';
-import { useRouter, Link } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Slider from '../../slider';
+
 const { width } = Dimensions.get('window');
 
 const Home = () => {
   const router = useRouter();
-  const [data, setData] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filteredData, setFilteredData] = useState([]);
-  const [userId, setUserId] = useState(null);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true); 
   const [filteredLaptops, setFilteredLaptops] = useState([]);
@@ -22,79 +20,56 @@ const Home = () => {
   const [filteredLatest, setFilteredLatest] = useState([]);
   const [filteredPhones, setFilteredPhones] = useState([]);
   const [filteredAccessories, setFilteredAccessories] = useState([]);
-  
-  useEffect(() => {
-    const latest = products.filter((item) => item.category === 'latest');
-    const popular = products.filter((item) => item.category === 'popular');
-    const laptops = products.filter((item) => item.category === 'laptop');
-    const phones = products.filter((item) => item.category === 'phone');
-    const accessories = products.filter(
-      (item) => item.category === 'accessories'
-    );
-
-    setFilteredPopular(
-      popular.filter((item) =>
-        item.name.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    );
-
-    setFilteredLatest(
-      latest.filter((item) =>
-        item.name.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    );
-
-    setFilteredLaptops(
-      laptops.filter((item) =>
-        item.name.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    );
-
-    setFilteredPhones(
-      phones.filter((item) =>
-        item.name.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    );
-    setFilteredAccessories(
-      accessories.filter((item) =>
-        item.name.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    );
-  }, [products, searchTerm]);
-
-  useEffect(() => {
-    const unsubscribeAuth = onAuthStateChanged(getAuth(), (user) => {
-      if (user) {
-        setUserId(user.uid);
-      } else {
-        setUserId(null);
-      }
-    });
-
-    return () => unsubscribeAuth();
-  }, []);
 
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, 'Products'), (snapshot) => {
-      const fetchedData = snapshot.docs.map((doc) => ({
+      const fetchedProducts = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));
-      setData(fetchedData);
-      setFilteredData(fetchedData);
-      setLoading(false);
-      setProducts(fetchedData);
+      setProducts(fetchedProducts); 
+
+      const popular = fetchedProducts.filter((item) => item.category === 'popular');
+      const latest = fetchedProducts.filter((item) => item.category === 'latest');
+      const laptops = fetchedProducts.filter((item) => item.category === 'laptop');
+      const phones = fetchedProducts.filter((item) => item.category === 'phone');
+      const accessories = fetchedProducts.filter((item) => item.category === 'accessories');
+
+      setFilteredPopular(
+        popular.filter((item) =>
+          item.name.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+      );
+
+      setFilteredLatest(
+        latest.filter((item) =>
+          item.name.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+      );
+
+      setFilteredLaptops(
+        laptops.filter((item) =>
+          item.name.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+      );
+
+      setFilteredPhones(
+        phones.filter((item) =>
+          item.name.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+      );
+
+      setFilteredAccessories(
+        accessories.filter((item) =>
+          item.name.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+      );
+
+      setLoading(false); 
     });
 
-    return () => unsubscribe();
-  }, []);
-
-  useEffect(() => {
-    const filteredResults = data.filter((item) =>
-      item.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    setFilteredData(filteredResults);
-  }, [searchTerm, data]);
+    return () => unsubscribe(); 
+  }, [searchTerm]); 
 
   const renderProduct = ({ item }) => (
     <View style={styles.itemContainer}>

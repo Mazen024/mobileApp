@@ -19,49 +19,6 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  // useEffect(() => {
-  //   if (username) {
-  //     handleLoginAndNavigate();
-  //   }
-  // }, [username]);
-
-  // const handleLogin = async () => {
-  //   try {
-  //     const auth = getAuth();
-  //     const userCredential = await signInWithEmailAndPassword(auth, email, password);
-  //     const user = userCredential.user;
-  //     const userId = user.uid;
-
-  //     const usersRef = collection(db, "users");
-  //     const userQuery = query(usersRef, where("userId", "==", userId));
-  //     const querySnapshot = await getDocs(userQuery);
-  //     if (!querySnapshot.empty) {
-  //       const userData = querySnapshot.docs[0].data();
-  //       return userData.name;
-  //     } else {
-  //       throw new Error("User not found");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error logging in:", error);
-  //     setErrors("Error logging in:", error.message);
-  //     return null;
-  //   }
-  // };
-
-  // const handleLoginAndNavigate = async () => {
-  //   const username = await handleLogin();
-  //   if (username !== null) {
-  //     const auth = getAuth();
-  //     const user = auth.currentUser;
-  //     const userId = user.uid;
-  //     if (userData.isAdmin) {
-  //       router.replace(`./admins/admin?userId=${userId}&username=${username}`);
-  //     } else {
-  //       router.replace(`/Home?userId=${userId}&username=${username}`);
-  //     }
-  //   }
-  // };
-
   const handleLoginButtonPress = async () => {
     setUsername(await handleLogin());
   };

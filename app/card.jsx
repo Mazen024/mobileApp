@@ -12,29 +12,27 @@ export default function Cart() {
 
   useEffect(() => {
     const auth = getAuth();
-    const unsubscribe = onAuthStateChanged(auth, (authenticatedUser) => {
-      setUserId(authenticatedUser ? authenticatedUser.uid : null);
+    const unsubscribeAuth = onAuthStateChanged(auth, (authenticatedUser) => {
+      setUserId(authenticatedUser ? authenticatedUser.uid : null); 
     });
-    return () => unsubscribe();
-  }, []);
-
-  useEffect(() => {
+    let unsubscribeCart = null;
     if (userId) {
       const cartQuery = query(collection(db, 'Cart'), where('userId', '==', userId));
-      const unsubscribe = onSnapshot(cartQuery, (snapshot) => {
-        const cartData = snapshot.docs.map((doc) => {
-          const data = doc.data();
-          return {
-            id: doc.id,
-            productId: data.productId,
-            quantity: data.quantity,
-          };
-        });
+      unsubscribeCart = onSnapshot(cartQuery, (snapshot) => {
+        const cartData = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
         setCartItems(cartData);
       });
-
-      return () => unsubscribe();
     }
+
+    return () => {
+      unsubscribeAuth(); 
+      if (unsubscribeCart) {
+        unsubscribeCart(); 
+      }
+    };
   }, [userId]);
 
   const removeCartItem = async (productId) => {
@@ -135,14 +133,14 @@ function CartItem({ productId, quantity, onRemove, onUpdateQuantity }) {
   const increaseQuantity = () => {
     const newQuantity = itemQuantity + 1;
     setItemQuantity(newQuantity);
-    onUpdateQuantity(newQuantity); // Update the quantity in the parent component
+    onUpdateQuantity(newQuantity); 
   };
 
   const decreaseQuantity = () => {
     if (itemQuantity > 1) {
       const newQuantity = itemQuantity - 1;
       setItemQuantity(newQuantity);
-      onUpdateQuantity(newQuantity); // Update the quantity in the parent component
+      onUpdateQuantity(newQuantity); 
     }
   };
 

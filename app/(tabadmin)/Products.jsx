@@ -25,28 +25,17 @@ export default function adminProduct() {
         id: doc.id,
         ...doc.data(),
       }));
-      setData(updatedData);
+      setData(updatedData); // Set the full data array
+
+      // Apply filtering logic when data is updated
+      const filterResults = updatedData.filter((item) =>
+        item.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredData(filterResults); // Update filtered data
     });
 
-    return () => unsubscribe();
-  }, []);
-
-  useEffect(() => {
-    const filterResults = data.filter((item) =>
-      item.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    setFilteredData(filterResults);
-  }, [searchTerm, data]);
-
-  const handleSignOut = async () => {
-    try {
-      const auth = getAuth();
-      await signOut(auth);
-      router.replace('/login');
-    } catch (error) {
-      console.error('Error signing out:', error);
-    }
-  };
+    return () => unsubscribe(); // Clean up when the component unmounts
+  }, [searchTerm]); 
 
   const handleDelete = async (productName) => {
     try {

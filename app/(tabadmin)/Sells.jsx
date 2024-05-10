@@ -30,8 +30,8 @@ const Sells = () => {
   
 
   const formatTimestamp = (timestamp) => {
-    const date = timestamp.toDate(); // Convert timestamp to Date object
-    return date.toLocaleString(); // Format date as a string
+    const date = timestamp.toDate(); 
+    return date.toLocaleString(); 
   };
 
   return (

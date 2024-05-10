@@ -63,9 +63,6 @@ const AddProduct = () => {
       <Pressable style={styles.addButton} onPress={handleAddProduct}>
         <Text style={styles.buttonText}>Add Product</Text>
       </Pressable>
-      {/* <Pressable style={[styles.addButton]} onPress={()=> router.back()}>
-        <Text style={styles.buttonText}>Back</Text>
-      </Pressable> */}
     </View>
   );
 };

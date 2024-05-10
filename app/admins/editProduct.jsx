@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, Pressable } from 'react-native';
-import { updateDoc, doc, query, collection, getDocs, where } from 'firebase/firestore';
+import { updateDoc, query, collection, getDocs, where } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { Ionicons } from '@expo/vector-icons'; 
 
