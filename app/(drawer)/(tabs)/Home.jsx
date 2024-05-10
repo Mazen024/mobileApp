@@ -1,25 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import {
-  Text,
-  View,
-  StyleSheet,
-  SafeAreaView,
-  FlatList,
-  Pressable,
-  TextInput,
-  ScrollView,
-  Dimensions,
-  ActivityIndicator
-} from 'react-native';
-import {
-  addDoc,
-  getDocs,
-  where,
-  query,
-  collection,
-  onSnapshot,
-  deleteDoc,
-} from 'firebase/firestore';
+import {Text,View,StyleSheet,SafeAreaView,FlatList,Pressable,TextInput,ScrollView,Dimensions,ActivityIndicator} from 'react-native';
+import {addDoc,getDocs,where,query,collection,onSnapshot,deleteDoc,} from 'firebase/firestore';
 import { db } from '../../../firebase';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import Item from '../../Item';
@@ -28,23 +9,20 @@ import { Ionicons } from '@expo/vector-icons';
 import Slider from '../../slider';
 const { width } = Dimensions.get('window');
 
-
 const Home = () => {
   const router = useRouter();
   const [data, setData] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredData, setFilteredData] = useState([]);
   const [userId, setUserId] = useState(null);
-  const [favorites, setFavorites] = useState({});
-  const [addedToCart, setAddedToCart] = useState(true);
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true); 
   const [filteredLaptops, setFilteredLaptops] = useState([]);
   const [filteredPopular, setFilteredPopular] = useState([]);
   const [filteredLatest, setFilteredLatest] = useState([]);
   const [filteredPhones, setFilteredPhones] = useState([]);
   const [filteredAccessories, setFilteredAccessories] = useState([]);
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true); // Loading state
-
+  
   useEffect(() => {
     const latest = products.filter((item) => item.category === 'latest');
     const popular = products.filter((item) => item.category === 'popular');
@@ -104,7 +82,8 @@ const Home = () => {
       }));
       setData(fetchedData);
       setFilteredData(fetchedData);
-      setLoading(false); // Set loading to false after fetching data
+      setLoading(false);
+      setProducts(fetchedData);
     });
 
     return () => unsubscribe();
@@ -117,133 +96,16 @@ const Home = () => {
     setFilteredData(filteredResults);
   }, [searchTerm, data]);
 
-  useEffect(() => {
-    const unsubscribe = onSnapshot(collection(db, 'Products'), (snapshot) => {
-      const fetchedProducts = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setProducts(fetchedProducts);
-    });
-    return () => unsubscribe();
-  }, []);
-
-  useEffect(() => {
-    if (userId) {
-      const favoriteQuery = collection(db, 'Favorites');
-      const unsubscribe = onSnapshot(favoriteQuery, (snapshot) => {
-        const favoritesData = snapshot.docs.reduce((acc, doc) => {
-          const data = doc.data();
-          if (data.userId === userId) {
-            acc[data.productId] = true;
-          }
-          return acc;
-        }, {});
-        setFavorites(favoritesData);
-      });
-
-      return () => unsubscribe();
-    }
-  }, [userId]);
-
-  const toggleFavorite = async (productId) => {
-    if (!userId) {
-      alert('Please sign in to manage your favorites');
-      return;
-    }
-
-    if (favorites[productId]) {
-      const favoriteSnapshot = await getDocs(collection(db, 'Favorites'));
-      const favoriteDoc = favoriteSnapshot.docs.find(
-        (doc) =>
-          doc.data().productId === productId && doc.data().userId === userId
-      );
-      if (favoriteDoc) {
-        await deleteDoc(favoriteDoc.ref);
-        setFavorites((prev) => ({ ...prev, [productId]: false }));
-      }
-    } else {
-      await addDoc(collection(db, 'Favorites'), {
-        userId,
-        productId,
-      });
-      setFavorites((prev) => ({ ...prev, [productId]: true }));
-    }
-  };
-
-  const toggleCart = async (productId) => {
-    try {
-      if (!userId) {
-        alert('Please sign in to add items to your cart');
-        return;
-      }
-
-      const cartQuery = query(
-        collection(db, 'Cart'),
-        where('userId', '==', userId),
-        where('productId', '==', productId)
-      );
-      const cartSnapshot = await getDocs(cartQuery);
-
-      if (!cartSnapshot.empty) {
-        // Remove from cart
-        const cartDoc = cartSnapshot.docs[0];
-        await deleteDoc(cartDoc.ref);
-        setAddedToCart((prev) => ({ ...prev, [productId]: false }));
-      } else {
-        // Add to cart
-        const data = {
-          userId,
-          productId,
-          quantity: 1,
-        };
-        await addDoc(collection(db, 'Cart'), data);
-        setAddedToCart((prev) => ({ ...prev, [productId]: true }));
-      }
-
-      console.log('Toggled ${productId} in the cart');
-    } catch (error) {
-      console.error('Error toggling cart:', error);
-    }
-  };
-
   const renderProduct = ({ item }) => (
     <View style={styles.itemContainer}>
-      <View style={styles.itemActions}>
-        <Pressable onPress={() => toggleFavorite(item.id)}>
-          <Ionicons
-            name="heart-outline"
-            size={30}
-            color={favorites[item.id] ? '#0a4a7c' : 'lightgray'}
-          />
-        </Pressable>
-      </View>
       <Item
         name={item.name}
         price={item.price}
         image={item.imageUrl}
         productId={item.id}
       />
-      <Pressable
-        style={styles.itemActions}
-        onPress={() => toggleCart(item.id)}
-      >
-        <Ionicons
-          name="cart-outline"
-          size={30}
-          color={addedToCart[item.id] ? '#0a4a7c' : 'lightgray'}
-        />
-      </Pressable>
     </View>
   );
-
-  // if (loading) {
-  //   return (
-  //     <View style={styles.loadingContainer}>
-  //       <Text>Loading...</Text>
-  //     </View>
-  //   );
-  // }
 
   return (
     <ScrollView style={styles.scrollContainer}>
@@ -273,9 +135,6 @@ const Home = () => {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>
             Latest Products
-            <Pressable onPress={() => router.push('login')}>
-              <Text style={styles.see}>see more {'>>'}</Text>
-            </Pressable>
           </Text>
           <FlatList
             data={filteredLatest}
@@ -294,9 +153,6 @@ const Home = () => {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>
             Most Popular
-            <Pressable onPress={() => router.push('login')}>
-              <Text style={styles.see}>see more {'>>'}</Text>
-            </Pressable>
           </Text>
           <FlatList
             data={filteredPopular}
@@ -305,7 +161,7 @@ const Home = () => {
             horizontal={true}
             ListEmptyComponent={
               <View>
-              <ActivityIndicator></ActivityIndicator>
+              <ActivityIndicator size={50}></ActivityIndicator>
             </View>
             }
           />
@@ -315,7 +171,7 @@ const Home = () => {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>
             Laptops
-            <Pressable onPress={() => router.push('login')}>
+            <Pressable onPress={() => router.push(`/categories?category=laptop`)}>
               <Text style={styles.see}>see more {'>>'} </Text>
             </Pressable>
           </Text>
@@ -326,7 +182,7 @@ const Home = () => {
             keyExtractor={(item) => item.id}
             ListEmptyComponent={
               <View>
-              <ActivityIndicator></ActivityIndicator>
+              <ActivityIndicator size={50}></ActivityIndicator>
             </View>
             }
           />
@@ -336,7 +192,7 @@ const Home = () => {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>
             Phones
-            <Pressable onPress={() => router.push('login')}>
+            <Pressable onPress={() => router.push(`/categories?category=phone`)}>
               <Text style={styles.see}>see more {'>>'}</Text>
             </Pressable>
           </Text>
@@ -347,7 +203,7 @@ const Home = () => {
             horizontal={true}
             ListEmptyComponent={
               <View>
-              <ActivityIndicator></ActivityIndicator>
+              <ActivityIndicator size={50}></ActivityIndicator>
             </View>
             }
           />
@@ -357,7 +213,7 @@ const Home = () => {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>
             Accessories
-            <Pressable onPress={() => router.push('login')}>
+            <Pressable onPress={() => router.push(`/categories?category=accessories`)}>
               <Text style={styles.see}>see more {'>>'}</Text>
             </Pressable>
           </Text>
@@ -368,7 +224,7 @@ const Home = () => {
             horizontal={true}
             ListEmptyComponent={
               <View>
-                <ActivityIndicator></ActivityIndicator>
+              <ActivityIndicator size={50}></ActivityIndicator>
               </View>
             }
           />

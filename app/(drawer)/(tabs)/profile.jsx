@@ -33,9 +33,9 @@ const Profile = () => {
             setFormData({
               name: userData.name || '',
               email: userData.email || '',
-              age: userData.age || '',
+              Age: userData.Age || '',
               gender: userData.gender || '',
-              city: userData.city || '',
+              Phone: userData.Phone || '',
             });
   
             if (userData.image) {
@@ -127,9 +127,9 @@ const Profile = () => {
       await updateDoc(docRef, {
         name: formData.name,
         email: formData.email,
-        age: formData.age || '', // Ensure field is not undefined
+        Age: formData.Age || '', // Ensure field is not undefined
         gender: formData.gender || '', // Ensure field is not undefined
-        city: formData.city || '', // Ensure field is not undefined
+        Phone: formData.Phone || '', // Ensure field is not undefined
       });
 
       setUser(formData); // Update user data
@@ -163,7 +163,6 @@ const Profile = () => {
   
   return (
     <ScrollView>
-
     <View style={styles.container}>
     {user ? (
       <View style={styles.profileBox}>
@@ -178,7 +177,7 @@ const Profile = () => {
         </View>
 
         <View style={styles.userInfo}>
-          {['name', 'email', 'age', 'gender', 'city'].map((field) => (
+          {['name', 'email', 'Age', 'gender', 'Phone'].map((field) => (
             <View key={field} style={styles.fieldContainer}>
               {currentlyEditing === field ? (
                 <TextInput
