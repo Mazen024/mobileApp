@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { StyleSheet, View, TextInput, Pressable, Text , ImageBackground , Image } from "react-native";
-import { Link, router } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
@@ -16,54 +16,86 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState(null);
   const [username, setUsername] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
-  useEffect(() => {
-    if (username) {
-      handleLoginAndNavigate();
-    }
-  }, [username]);
+  // useEffect(() => {
+  //   if (username) {
+  //     handleLoginAndNavigate();
+  //   }
+  // }, [username]);
 
-  const handleLogin = async () => {
-    try {
-      const auth = getAuth();
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-      const userId = user.uid;
+  // const handleLogin = async () => {
+  //   try {
+  //     const auth = getAuth();
+  //     const userCredential = await signInWithEmailAndPassword(auth, email, password);
+  //     const user = userCredential.user;
+  //     const userId = user.uid;
 
-      const usersRef = collection(db, "users");
-      const userQuery = query(usersRef, where("userId", "==", userId));
-      const querySnapshot = await getDocs(userQuery);
-      if (!querySnapshot.empty) {
-        const userData = querySnapshot.docs[0].data();
-        return userData.name;
-      } else {
-        throw new Error("User not found");
-      }
-    } catch (error) {
-      console.error("Error logging in:", error);
-      setErrors("Error logging in:", error.message);
-      return null;
-    }
-  };
+  //     const usersRef = collection(db, "users");
+  //     const userQuery = query(usersRef, where("userId", "==", userId));
+  //     const querySnapshot = await getDocs(userQuery);
+  //     if (!querySnapshot.empty) {
+  //       const userData = querySnapshot.docs[0].data();
+  //       return userData.name;
+  //     } else {
+  //       throw new Error("User not found");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error logging in:", error);
+  //     setErrors("Error logging in:", error.message);
+  //     return null;
+  //   }
+  // };
 
-  const handleLoginAndNavigate = async () => {
-    const username = await handleLogin();
-    if (username !== null) {
-      const auth = getAuth();
-      const user = auth.currentUser;
-      const userId = user.uid;
-      if (userId === "68OeibuKs1P1iUcu4Vm5eFwbm7I3") {
-        router.replace(`./admins/admin?userId=${userId}&username=${username}`);
-      } else {
-        router.replace(`/Home?userId=${userId}&username=${username}`);
-      }
-    }
-  };
+  // const handleLoginAndNavigate = async () => {
+  //   const username = await handleLogin();
+  //   if (username !== null) {
+  //     const auth = getAuth();
+  //     const user = auth.currentUser;
+  //     const userId = user.uid;
+  //     if (userData.isAdmin) {
+  //       router.replace(`./admins/admin?userId=${userId}&username=${username}`);
+  //     } else {
+  //       router.replace(`/Home?userId=${userId}&username=${username}`);
+  //     }
+  //   }
+  // };
 
   const handleLoginButtonPress = async () => {
     setUsername(await handleLogin());
   };
 
+  const handleLogin = async () => {
+    setIsLoading(true);
+    try {
+      const auth = getAuth();
+      const userCredential = await signInWithEmailAndPassword(auth, email, password); // Authenticate user
+      const user = userCredential.user;
+
+      // After authentication, check if the user is an admin
+      const userQuery = query(collection(db, 'users'), where('userId', '==', user.uid));
+      const querySnapshot = await getDocs(userQuery);
+      const userId = user.uid;
+      
+      if (querySnapshot.empty) {
+        throw new Error('User data not found');
+      }
+
+      const userData = querySnapshot.docs[0].data();
+
+      if (userData.isAdmin) { // Check if the user has admin privileges
+        router.replace(`./Products?userId=${userId}&username=${username}`);
+      } else {
+        router.replace(`/Home?userId=${userId}&username=${username}`);
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      Alert.alert('Error', 'Failed to login. Please check your credentials.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Login</Text>

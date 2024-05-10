@@ -1,11 +1,10 @@
 import React, { useState } from "react";
 import { Link, router } from "expo-router";
-import { StyleSheet, View, TextInput, TouchableOpacity, Text , ImageBackground , Image} from "react-native";
+import { StyleSheet, ScrollView , View, TextInput, TouchableOpacity, Text , ImageBackground , Image} from "react-native";
 import { firebase } from "../firebase";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import { collection, addDoc } from "firebase/firestore";
 import { db } from "../firebase";
-import Login from "./login";
 
 const CustomAlert = ({ message }) => (
   <View style={styles.alertContainer}>
@@ -15,6 +14,9 @@ const CustomAlert = ({ message }) => (
 
 const SignUp = () => {
   const [username, setUsername] = useState("");
+  const [Age, setAge] = useState("");
+  const [gender, setgender] = useState("");
+  const [Phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -37,6 +39,10 @@ const SignUp = () => {
         email: email,
         password: password,
         userId: userId,
+        gender: gender,
+        isAdmin : false,
+        Age : Age , 
+        Phone : Phone ,
       };
       await addDoc(collection(db, "users"), userData);
 
@@ -48,6 +54,7 @@ const SignUp = () => {
   };
 
   return (
+    <ScrollView>
     <View style={styles.container}>
       <Text style={styles.title}>Sign Up</Text>
       <TextInput
@@ -76,6 +83,24 @@ const SignUp = () => {
         value={confirmPassword}
         secureTextEntry
       />
+      <TextInput
+        style={styles.input}
+        placeholder="Phone Number"
+        onChangeText={setPhone}
+        value={Phone}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Age"
+        onChangeText={setAge}
+        value={Age}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="gender"
+        onChangeText={setgender}
+        value={gender}
+      />
       <TouchableOpacity style={styles.button} onPress={handleSignUp}>
         <Text style={styles.buttonText}>Sign Up</Text>
       </TouchableOpacity>
@@ -84,6 +109,7 @@ const SignUp = () => {
       </Text>
       {error && <CustomAlert message={error} />}
     </View>
+</ScrollView>
   );
 };
 
@@ -97,7 +123,8 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 70, 
-    marginBottom: 40, 
+    marginBottom: 40,
+    paddingTop: 30,
     fontWeight: 'bold',
     color: "#0a4a7c", 
   },

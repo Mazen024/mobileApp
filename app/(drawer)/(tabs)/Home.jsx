@@ -1,36 +1,58 @@
 import React, { useEffect, useState } from 'react';
-import {Text,View,StyleSheet,SafeAreaView,FlatList,Pressable,TextInput,Animated,Dimensions , ScrollView , SectionList } from 'react-native';
-import { addDoc, getDocs,where , query,collection, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
+import {
+  Text,
+  View,
+  StyleSheet,
+  SafeAreaView,
+  FlatList,
+  Pressable,
+  TextInput,
+  ScrollView,
+  Dimensions,
+  ActivityIndicator
+} from 'react-native';
+import {
+  addDoc,
+  getDocs,
+  where,
+  query,
+  collection,
+  onSnapshot,
+  deleteDoc,
+} from 'firebase/firestore';
 import { db } from '../../../firebase';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import Item from '../../Item';
-import { useRouter , Link } from 'expo-router';
+import { useRouter, Link } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import Slider from '../../slider';
-
 const { width } = Dimensions.get('window');
 
-export default function Home() {
+
+const Home = () => {
   const router = useRouter();
   const [data, setData] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredData, setFilteredData] = useState([]);
   const [userId, setUserId] = useState(null);
-  const [favorites, setFavorites] = useState({}); 
+  const [favorites, setFavorites] = useState({});
   const [addedToCart, setAddedToCart] = useState(true);
   const [filteredLaptops, setFilteredLaptops] = useState([]);
   const [filteredPopular, setFilteredPopular] = useState([]);
   const [filteredLatest, setFilteredLatest] = useState([]);
   const [filteredPhones, setFilteredPhones] = useState([]);
-  const [filteredAccessories , setFilteredAccessories] = useState([]);
+  const [filteredAccessories, setFilteredAccessories] = useState([]);
   const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true); // Loading state
 
   useEffect(() => {
     const latest = products.filter((item) => item.category === 'latest');
     const popular = products.filter((item) => item.category === 'popular');
     const laptops = products.filter((item) => item.category === 'laptop');
     const phones = products.filter((item) => item.category === 'phone');
-    const accessories = products.filter((item) => item.category === 'accessories');
+    const accessories = products.filter(
+      (item) => item.category === 'accessories'
+    );
 
     setFilteredPopular(
       popular.filter((item) =>
@@ -82,6 +104,7 @@ export default function Home() {
       }));
       setData(fetchedData);
       setFilteredData(fetchedData);
+      setLoading(false); // Set loading to false after fetching data
     });
 
     return () => unsubscribe();
@@ -112,7 +135,7 @@ export default function Home() {
         const favoritesData = snapshot.docs.reduce((acc, doc) => {
           const data = doc.data();
           if (data.userId === userId) {
-            acc[data.productId] = true; 
+            acc[data.productId] = true;
           }
           return acc;
         }, {});
@@ -132,7 +155,8 @@ export default function Home() {
     if (favorites[productId]) {
       const favoriteSnapshot = await getDocs(collection(db, 'Favorites'));
       const favoriteDoc = favoriteSnapshot.docs.find(
-        (doc) => doc.data().productId === productId && doc.data().userId === userId
+        (doc) =>
+          doc.data().productId === productId && doc.data().userId === userId
       );
       if (favoriteDoc) {
         await deleteDoc(favoriteDoc.ref);
@@ -153,10 +177,14 @@ export default function Home() {
         alert('Please sign in to add items to your cart');
         return;
       }
-  
-      const cartQuery = query(collection(db, 'Cart'), where('userId', '==', userId), where('productId', '==', productId));
+
+      const cartQuery = query(
+        collection(db, 'Cart'),
+        where('userId', '==', userId),
+        where('productId', '==', productId)
+      );
       const cartSnapshot = await getDocs(cartQuery);
-  
+
       if (!cartSnapshot.empty) {
         // Remove from cart
         const cartDoc = cartSnapshot.docs[0];
@@ -168,18 +196,17 @@ export default function Home() {
           userId,
           productId,
           quantity: 1,
-        }
+        };
         await addDoc(collection(db, 'Cart'), data);
         setAddedToCart((prev) => ({ ...prev, [productId]: true }));
       }
-  
+
       console.log('Toggled ${productId} in the cart');
-  
     } catch (error) {
       console.error('Error toggling cart:', error);
     }
   };
-  
+
   const renderProduct = ({ item }) => (
     <View style={styles.itemContainer}>
       <View style={styles.itemActions}>
@@ -187,7 +214,7 @@ export default function Home() {
           <Ionicons
             name="heart-outline"
             size={30}
-            color={favorites[item.id] ? "#0a4a7c" : 'lightgray'}
+            color={favorites[item.id] ? '#0a4a7c' : 'lightgray'}
           />
         </Pressable>
       </View>
@@ -197,16 +224,27 @@ export default function Home() {
         image={item.imageUrl}
         productId={item.id}
       />
-        <Pressable style={styles.itemActions} onPress={() => toggleCart(item.id)}>
-          <Ionicons
-            name="cart-outline"
-            size={30}
-            color={addedToCart[item.id] ? "#0a4a7c" : 'lightgray'}
-          />
-        </Pressable>
-      </View>
+      <Pressable
+        style={styles.itemActions}
+        onPress={() => toggleCart(item.id)}
+      >
+        <Ionicons
+          name="cart-outline"
+          size={30}
+          color={addedToCart[item.id] ? '#0a4a7c' : 'lightgray'}
+        />
+      </Pressable>
+    </View>
   );
-  
+
+  // if (loading) {
+  //   return (
+  //     <View style={styles.loadingContainer}>
+  //       <Text>Loading...</Text>
+  //     </View>
+  //   );
+  // }
+
   return (
     <ScrollView style={styles.scrollContainer}>
       <SafeAreaView style={styles.safeContainer}>
@@ -218,12 +256,12 @@ export default function Home() {
             value={searchTerm}
             onChangeText={(text) => setSearchTerm(text)}
           />
-        <Pressable
-          style={styles.cardButton}
-          onPress={() => router.push('/card')}
-        >
-        <Ionicons name="cart-outline" size={40} color="#0a4a7c" />
-        </Pressable>
+          <Pressable
+            style={styles.cardButton}
+            onPress={() => router.push('/card')}
+          >
+            <Ionicons name="cart-outline" size={40} color="#0a4a7c" />
+          </Pressable>
         </View>
 
         {/* Slider Section */}
@@ -231,102 +269,122 @@ export default function Home() {
           <Slider />
         </View>
 
-         {/* Latest products Section */}
-         <View style={styles.section}>  
-          <Text style={styles.sectionTitle}>Latest Products
-          <Pressable  onPress={() => router.push('login')}>
-            <Text style={styles.see}>see more {'>>'}</Text>
-          </Pressable>        
-          </Text> 
+        {/* Latest products Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>
+            Latest Products
+            <Pressable onPress={() => router.push('login')}>
+              <Text style={styles.see}>see more {'>>'}</Text>
+            </Pressable>
+          </Text>
           <FlatList
             data={filteredLatest}
             renderItem={renderProduct}
             keyExtractor={(item) => item.id}
             horizontal={true}
             ListEmptyComponent={
-              <Text style={styles.emptyText}>No Products found</Text>
+              <View >
+              <ActivityIndicator size={50}></ActivityIndicator>
+            </View>
             }
           />
         </View>
 
-         {/* Most popular products Section */}
-         <View style={styles.section}>  
-          <Text style={styles.sectionTitle}>Most Popular
-          <Pressable  onPress={() => router.push('login')}>
-          <Text style={styles.see}>see more {'>>'}</Text>
-          </Pressable>        
-          </Text> 
+        {/* Most popular products Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>
+            Most Popular
+            <Pressable onPress={() => router.push('login')}>
+              <Text style={styles.see}>see more {'>>'}</Text>
+            </Pressable>
+          </Text>
           <FlatList
             data={filteredPopular}
             renderItem={renderProduct}
             keyExtractor={(item) => item.id}
             horizontal={true}
             ListEmptyComponent={
-              <Text style={styles.emptyText}>No Products found</Text>
+              <View>
+              <ActivityIndicator></ActivityIndicator>
+            </View>
             }
           />
         </View>
 
         {/* Laptops Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Laptops 
-          <Pressable  onPress={() => router.push('login')}>
-          <Text style={styles.see}>see more {'>>'} </Text>
-          </Pressable>        
-          </Text>  
+          <Text style={styles.sectionTitle}>
+            Laptops
+            <Pressable onPress={() => router.push('login')}>
+              <Text style={styles.see}>see more {'>>'} </Text>
+            </Pressable>
+          </Text>
           <FlatList
             data={filteredLaptops}
             horizontal={true}
             renderItem={renderProduct}
             keyExtractor={(item) => item.id}
             ListEmptyComponent={
-            <Text style={styles.emptyText}>No Products found</Text>
+              <View>
+              <ActivityIndicator></ActivityIndicator>
+            </View>
             }
           />
         </View>
 
         {/* Phones Section */}
-        <View style={styles.section}>  
-          <Text style={styles.sectionTitle}>Phones
-          <Pressable  onPress={() => router.push('login')}>
-          <Text style={styles.see}>see more {'>>'}</Text>
-          </Pressable>        
-          </Text> 
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>
+            Phones
+            <Pressable onPress={() => router.push('login')}>
+              <Text style={styles.see}>see more {'>>'}</Text>
+            </Pressable>
+          </Text>
           <FlatList
             data={filteredPhones}
             renderItem={renderProduct}
             keyExtractor={(item) => item.id}
             horizontal={true}
             ListEmptyComponent={
-              <Text style={styles.emptyText}>No Products found</Text>
+              <View>
+              <ActivityIndicator></ActivityIndicator>
+            </View>
             }
           />
         </View>
 
-
-         {/* Accessories Section */}
-         <View style={styles.section}>  
-          <Text style={styles.sectionTitle}>Accessories
-          <Pressable  onPress={() => router.push('login')}>
-          <Text style={styles.see}>see more {'>>'}</Text>
-          </Pressable>        
-          </Text> 
+        {/* Accessories Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>
+            Accessories
+            <Pressable onPress={() => router.push('login')}>
+              <Text style={styles.see}>see more {'>>'}</Text>
+            </Pressable>
+          </Text>
           <FlatList
             data={filteredAccessories}
             renderItem={renderProduct}
             keyExtractor={(item) => item.id}
             horizontal={true}
             ListEmptyComponent={
-              <Text style={styles.emptyText}>No Products found</Text>
+              <View>
+                <ActivityIndicator></ActivityIndicator>
+              </View>
             }
           />
         </View>
       </SafeAreaView>
     </ScrollView>
   );
-}
+};
 
 const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'white'
+  },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -342,7 +400,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     borderRadius: 10,
-    borderColor: "#0a4a7c",
+    borderColor: '#0a4a7c',
     borderWidth: 1,
     padding: 10,
     backgroundColor: 'white',
@@ -389,7 +447,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 10,
     marginBottom: 15,
-    backgroundColor : 'white',
+    backgroundColor: 'white',
     marginLeft: 10,
   },
   emptyText: {
@@ -397,10 +455,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#666',
   },
-  see : {
-    color: "#0a4a7c", 
-    textDecorationLine: 'underline', 
+  see: {
+    color: '#0a4a7c',
+    textDecorationLine: 'underline',
     fontSize: 12,
-
-    },
+  },
 });
+
+export default Home;

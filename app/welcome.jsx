@@ -12,7 +12,8 @@ const Welcome = () => {
     <View style={styles.container}>
         <View style={styles.container1}>
           <TouchableOpacity onPress={() => router.push('/Home')}>
-          <Ionicons name="close" size={30} style={styles.Icon}/>              
+            <Text style={styles.Icon}> Skip </Text>
+            {/* <Ionicons name="close" size={30} style={styles.Icon}/>               */}
           </TouchableOpacity>
           <View style={styles.logoc}>
           <Image source= {logo} resizeMode="contain" style={styles.logo} />
@@ -29,8 +30,8 @@ const Welcome = () => {
               </Pressable>
             </View>
 
-            <Text style={styles.link}> Don't have an account ? 
-            <Link href={"./signup"} style={styles.SignUp}>Sign Up</Link>
+            <Text style={styles.link}> Don't have an account ?    
+              <Link href={"./signup"} style={styles.SignUp}>Sign Up</Link>
             </Text>
             </View>
         </View>
@@ -60,7 +61,7 @@ const styles = StyleSheet.create({
   SignUp: {
     color: "#0a4a7c", 
     textDecorationLine: 'underline', 
-    fontSize: 20,  
+    fontSize: 20,
   },
   container: {
     flex: 1,
@@ -83,7 +84,11 @@ const styles = StyleSheet.create({
     textAlign :  'right',
     width: '100%' ,
     margin : 10 ,
-    marginBottom : 20 , 
+    marginBottom : 60 ,
+    marginTop : 20 ,
+    fontWeight: 'bold',
+    fontSize: 25,
+    color:  "#0a4a7c",
   },
   btn: {
     width: '100%' ,

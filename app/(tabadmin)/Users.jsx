@@ -28,26 +28,25 @@ export default function adminUsers() {
     setFilteredData(filterResults);
   }, [searchTerm, users]);
 
-  const handleDeleteUser = async (userEmail) => {
-    try {
-      if (userEmail === 'adelmazen47@gmail.com') {
-        alert('Admin user cannot be deleted by this way');
-        return;
-      }
-  
-      const querySnapshot = await getDocs(collection(db, 'users'));
-      const userDoc = querySnapshot.docs.find(doc => doc.data().email === userEmail);
+  // const handleDeleteUser = async (Admin) => {
+  //   try {
+  //     if ( Admin === true) {
+  //       alert('Admin user cannot be deleted by this way');
+  //       return;
+  //     }
+  //     const querySnapshot = await getDocs(collection(db, 'users'));
+  //     const userDoc = querySnapshot.docs.find(doc => doc.data().isAdmin === Admin);
       
-      if (userDoc) {
-        await deleteDoc(userDoc.ref);
-        console.log('User deleted successfully');
-      } else {
-        console.log('User not found');
-      }
-    } catch (error) {
-      console.error('Error deleting user:', error);
-    }
-  };
+  //     if (userDoc) {
+  //       await deleteDoc(userDoc.ref);
+  //       console.log('User deleted successfully');
+  //     } else {
+  //       console.log('User not found');
+  //     }
+  //   } catch (error) {
+  //     console.error('Error deleting user:', error);
+  //   }
+  // };
   
 
   return (
@@ -66,9 +65,9 @@ export default function adminUsers() {
           <View style={styles.itemContainer}>
             <Text>{item.name}</Text>
             <Text>{item.email}</Text>
-            <Pressable onPress={() => handleDeleteUser(item.email)} style={styles.deleteButton}>
+            {/* <Pressable onPress={() => handleDeleteUser(item.email)} style={styles.deleteButton}>
               <Ionicons name="trash-bin-outline" size={24} color="red" />
-            </Pressable>
+            </Pressable> */}
           </View>
         )}
         keyExtractor={(item) => item.id}

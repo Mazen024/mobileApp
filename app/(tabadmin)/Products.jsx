@@ -5,8 +5,8 @@ import { db } from '../../firebase';
 import { getAuth, signOut } from 'firebase/auth';
 import { useLocalSearchParams, router } from 'expo-router';
 import Item from '../Item';
-import AddProduct from './addProduct';
-import EditProduct from './editProduct';
+import AddProduct from '../admins/addProduct';
+import EditProduct from '../admins/editProduct';
 import deleteIcon from '../../assets/images/delete-vector-icon.jpg'
 import { Ionicons } from '@expo/vector-icons';
 
