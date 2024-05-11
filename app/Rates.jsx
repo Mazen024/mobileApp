@@ -107,7 +107,7 @@ const checkUserRating = async (userId, productId) => {
         where("productId", "==", productId)
       )
     );
-    console.log("rate = "+!ratingSnapshot.empty)
+    // console.log("rate = "+!ratingSnapshot.empty)
     return !ratingSnapshot.empty;
   } catch (error) {
     console.error('Error checking user rating:', error);

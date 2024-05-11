@@ -53,13 +53,13 @@ export default function Cart() {
 
   const handleCheckOut = async () => {
     try {
-      const checkoutTime = serverTimestamp(); // Timestamp of the checkout time
+      const checkoutTime = serverTimestamp();
 
       for (const item of cartItems) {
         const cartItemRef = doc(db, 'Cart', item.id);
         await updateDoc(cartItemRef, {
           quantity: item.quantity,
-          checkoutTime: checkoutTime // Add checkout time to each cart item
+          checkoutTime: checkoutTime
         });
       }
       router.push('CheckOut');
@@ -163,6 +163,9 @@ function CartItem({ productId, quantity, onRemove, onUpdateQuantity }) {
             <Text style={styles.quantityButton}>+</Text>
           </TouchableOpacity>
         </View>
+        <Pressable onPress={onRemove} style={styles.deleteButton}>
+          <Text style={styles.deleteButtonText}>Remove</Text>
+        </Pressable>
       </View>
     </View>
   );

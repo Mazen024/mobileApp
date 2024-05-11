@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, Image , Pressable , } from 'react-native';
 import { useLocalSearchParams } from "expo-router";
-import {query, collection , where , onSnapshot, doc, getDoc } from "firebase/firestore";
+import {query, collection , where , getDocs, doc, getDoc, updateDoc, addDoc  } from "firebase/firestore";
 import { db } from '../firebase'; 
 import StarRating from "./StarRating";
 import {addRate , deleteRate , getAverageRate , checkUserRating, getRateByUserIdAndProductId} from "./Rates";
@@ -53,18 +53,18 @@ export default function PressedItem( ) {
         alert('Please sign in to add items to your cart');
         return;
       }
-
+  
       const cartQuery = query(
         collection(db, 'Cart'),
         where('userId', '==', userId),
         where('productId', '==', productId)
       );
-      const cartSnapshot = await getDoc(cartQuery);
-
+      const cartSnapshot = await getDocs(cartQuery);
+  
       if (!cartSnapshot.empty) {
         const cartDoc = cartSnapshot.docs[0];
-        await deleteDoc(cartDoc.ref);
-        setAddedToCart((prev) => ({ ...prev, [productId]: false }));
+        const { quantity: currentQuantity } = cartDoc.data();
+        await updateDoc(cartDoc.ref, { quantity: currentQuantity + 1 });
       } else {
         const data = {
           userId,
@@ -72,13 +72,15 @@ export default function PressedItem( ) {
           quantity: 1,
         };
         await addDoc(collection(db, 'Cart'), data);
-        setAddedToCart((prev) => ({ ...prev, [productId]: true }));
       }
-
+  
+      console.log('Product added to cart successfully');
+  
     } catch (error) {
       console.error('Error toggling cart:', error);
     }
   };
+  
 
   const fetchProduct = async () => {
     const fetchedProduct = await getProductById(id);
@@ -87,11 +89,9 @@ export default function PressedItem( ) {
 
   const fetchRateByUserIdAndProductId = async () => {
     try {
-      console.log('userId', userId)
       const fetchedRates = await getRateByUserIdAndProductId(userId, productId);
       const rateQuantities = fetchedRates.map((rate) => rate.rate);
       setRating(rateQuantities);
-      console.log(rateQuantities);
     } catch (error) {
       console.error("Error fetching rates by user ID and product ID:", error);
     }
@@ -195,7 +195,7 @@ export default function PressedItem( ) {
             <Text style={{ fontWeight: "bold" }}>
               Average Rating: {averageRating}
             </Text>
-            <Pressable style={styles.buttonAdd} onPress={toggleCart}>
+            <Pressable style={styles.buttonAdd} onPress={() => toggleCart(productId)}>
               <Text style={styles.buttonText}>Add To Cart</Text>
             </Pressable>
           </>
@@ -231,8 +231,7 @@ const styles = StyleSheet.create({
       width: '100%', 
       height: '100%', 
       borderRadius: 20,
-      // marginLeft: 'auto',
-      // marginBottom: 'auto',
+      resizeMode: 'contain'
     },
     imageContainer: {
       marginTop: 20,
