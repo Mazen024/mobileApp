@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, Pressable, StyleSheet, Image, Alert } from 'react-native';
+import { View, Text, TextInput, Pressable, StyleSheet, Dimensions, Image, Alert } from 'react-native';
 import { getAuth, onAuthStateChanged ,signOut } from 'firebase/auth';
 import { collection, query, where, getDocs, updateDoc  } from 'firebase/firestore';
 import { db } from '../../../firebase';
@@ -7,6 +7,9 @@ import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import { ScrollView } from 'react-native-gesture-handler';
+
+
+const windowWidth = Dimensions.get('window').width;
 
 const Profile = () => {
   const router = useRouter();
@@ -228,21 +231,10 @@ const Profile = () => {
 };
 
 const styles = StyleSheet.create({
-  fieldContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 10,
-    Width: '90%',
-  },
-  editIcon: {
-    padding: 10,
-  },
   container: {
     flex: 1,
     padding: 20,
     backgroundColor: '#F3F4F6',
-    // Width: '100%',
   },
   profileBox: {
     borderRadius: 10,
@@ -256,14 +248,14 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   profileImage: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
+    width: windowWidth * 0.3, // Adjust the image size based on the screen width
+    height: windowWidth * 0.3,
+    borderRadius: (windowWidth * 0.3) / 2, // Ensure the image is always a circle
   },
   cameraIcon: {
     position: 'absolute',
     bottom: -10,
-    right: -10,
+    right: 90,
     backgroundColor: 'rgba(0, 0, 0, 0.7)',
     borderRadius: 15,
     padding: 5,
@@ -290,6 +282,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     fontSize: 18,
     color: '#333',
+    width: '90%', // Adjust the input width based on the screen width
   },
   saveButton: {
     backgroundColor: '#3B82F6',
@@ -298,25 +291,18 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  saveButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 18,
+    alignSelf: 'center',
+    marginBottom: 20,
+    width: '50%', // Adjust the button width based on the screen width
   },
   signOutButton: {
     backgroundColor: '#EF4444',
     paddingVertical: 12,
     paddingHorizontal: 30,
     borderRadius: 8,
-    width: "60%",
     alignSelf: 'center',
-  },
-  signOutButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 18,
-    alignSelf: 'center',
+    marginBottom: 20,
+    width: '50%', // Adjust the button width based on the screen width
   },
   signInPrompt: {
     alignItems: 'center',
@@ -330,7 +316,6 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   signInButton: {
-    width:"50%",
     backgroundColor: "#0a4a7c",
     paddingVertical: 12,
     paddingHorizontal: 30,
@@ -339,30 +324,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignSelf: 'center',
     marginBottom: 20,
+    width: '50%', // Adjust the button width based on the screen width
   },
   signInButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 18,
-  },
-    fieldContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 10,
-  },
-  editIcon: {
-    padding: 10,
-  },
-  saveButton: {
-    backgroundColor: '#3B82F6',
-    paddingVertical: 12,
-    paddingHorizontal: 30,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  saveButtonText: {
     color: 'white',
     fontWeight: 'bold',
     fontSize: 18,
