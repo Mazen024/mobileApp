@@ -13,11 +13,10 @@ const addRate = async (rateData) => {
   }
 };
 
-// Method to calculate the average rate for a product
 const getAverageRate = async (productId) => {
   try {
     const querySnapshot = await getDocs(
-      query(ratesCollection, where("ProductId", "==", productId))
+      query(ratesCollection, where("productId", "==", productId))
     );
 
     let totalStars = 0;
@@ -25,12 +24,12 @@ const getAverageRate = async (productId) => {
 
     querySnapshot.forEach((doc) => {
       const rateData = doc.data();
-      totalStars += rateData.RateQuantity;
+      totalStars += rateData.rate;
       count++;
     });
 
     if (count === 0) {
-      return 0; // No rates yet
+      return 0;
     }
 
     return totalStars / count;
@@ -40,22 +39,18 @@ const getAverageRate = async (productId) => {
   }
 };
 
-// Method to delete a rate
 const deleteRate = async (userId, productId) => {
   try {
-    // Query the rates collection to find the rate with matching userId and productId
     const querySnapshot = await getDocs(
       query(
         collection(db, "rates"),
         where("userId", "==", userId),
-        where("ProductId", "==", productId)
+        where("productId", "==", productId)
       )
     );
 
-    // Check if there are any documents returned
     if (!querySnapshot.empty) {
-      // Delete the rate document
-      const rateDoc = querySnapshot.docs[0]; // Assuming there's only one matching rate
+      const rateDoc = querySnapshot.docs[0];
       await deleteDoc(rateDoc.ref);
       console.log("Rate deleted successfully.");
     } else {
@@ -67,7 +62,6 @@ const deleteRate = async (userId, productId) => {
 };
 
 
-// Method to get all rates for a product
 const getAllRates = async (productId) => {
   try {
     const querySnapshot = await getDocs(
@@ -86,12 +80,11 @@ const getAllRates = async (productId) => {
   }
 };
 
-// Method to get rates by userId
 const getRateByUserIdAndProductId = async (userId,ProductId) => {
   try {
     const querySnapshot = await getDocs(
       query(ratesCollection, where("userId", "==", userId),
-      where("ProductId", "==", ProductId))
+      where("productId", "==", ProductId))
     );
 
     const rates = [];
@@ -111,7 +104,7 @@ const checkUserRating = async (userId, productId) => {
       query(
         collection(db, "rates"),
         where("userId", "==", userId),
-        where("ProductId", "==", productId)
+        where("productId", "==", productId)
       )
     );
     console.log("rate = "+!ratingSnapshot.empty)

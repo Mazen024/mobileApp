@@ -22,25 +22,29 @@ export default function PressedItem( ) {
 
   useEffect(() => {
     const auth = getAuth();
-
-    const unsubscribeAuth = onAuthStateChanged(auth, (authenticatedUser) => {
-      setUserId(authenticatedUser ? authenticatedUser.uid : null);
-    });
-    let unsubscribeFavorites = null; 
-    if (userId) {
-      const favoritesQuery = query(collection(db, 'Favorites'), where('userId', '==', userId));
-      unsubscribeFavorites = onSnapshot(favoritesQuery, (snapshot) => {
-        const favorites = snapshot.docs.map((doc) => ({
-          productId: doc.data().productId,
-        }));
-      });
-    }
-    return () => {
-      unsubscribeAuth(); 
-      if (unsubscribeFavorites) {
-        unsubscribeFavorites(); 
+    const unsubscribe = onAuthStateChanged(auth, async (authenticatedUser) => {
+      if (authenticatedUser) {
+        const userId = authenticatedUser.uid;
+        setUserId(userId);
+      } else {
+        setUserId(null);
       }
-    };
+    });
+  
+    return () => unsubscribe();
+  }, []);
+  
+  useEffect(() => {
+    if (userId) {
+      async function fetchData() {
+        fetchRateByUserIdAndProductId();
+        checkUserRatingStatus();
+        setHasRated(hasRated);
+        fetchProduct();
+        fetchAverageRating();
+      }
+      fetchData();
+    }
   }, [userId]);
 
   const toggleCart = async (productId) => {
@@ -55,7 +59,7 @@ export default function PressedItem( ) {
         where('userId', '==', userId),
         where('productId', '==', productId)
       );
-      const cartSnapshot = await getDocs(cartQuery);
+      const cartSnapshot = await getDoc(cartQuery);
 
       if (!cartSnapshot.empty) {
         const cartDoc = cartSnapshot.docs[0];
@@ -76,17 +80,6 @@ export default function PressedItem( ) {
     }
   };
 
-  useEffect(() => {
-    async function fetchData() {
-      fetchRateByUserIdAndProductId();
-      checkUserRatingStatus();
-      setHasRated(hasRatedd);
-      fetchProduct();
-      fetchAverageRating();
-    }
-    fetchData();
-  }, []);
-
   const fetchProduct = async () => {
     const fetchedProduct = await getProductById(id);
     setProduct(fetchedProduct);
@@ -94,8 +87,9 @@ export default function PressedItem( ) {
 
   const fetchRateByUserIdAndProductId = async () => {
     try {
+      console.log('userId', userId)
       const fetchedRates = await getRateByUserIdAndProductId(userId, productId);
-      const rateQuantities = fetchedRates.map((rate) => rate.RateQuantity);
+      const rateQuantities = fetchedRates.map((rate) => rate.rate);
       setRating(rateQuantities);
       console.log(rateQuantities);
     } catch (error) {
@@ -121,39 +115,6 @@ export default function PressedItem( ) {
       console.error("Error submitting rating:", error);
     }
   };
-  
-  // const handleRatingDelete = async () => {
-  //   try {
-  //     if (!userId) {
-  //       alert('Please sign in to delete your rating.');
-  //       return;
-  //     }
-  
-  //     await deleteRate(userId, productId);
-  //     await fetchAverageRating();
-  //     await checkUserRatingStatus();
-  //     setRating(0);
-  //   } catch (error) {
-  //     console.error("Error deleting rating:", error);
-  //   }
-  // };
-  
-  // const handleRatingSubmit = async () => {
-  //   try {
-  //     const newRate = {
-  //       userId: userId,
-  //       ProductId: productId,
-  //       RateQuantity: rating,
-  //     };
-  //     await addRate(newRate);
-  //     checkUserRatingStatus();
-
-  //     fetchAverageRating();
-  //     setHasRated(true);
-  //   } catch (error) {
-  //     console.error("Error submitting rating:", error);
-  //   }
-  // };
 
   const handleRatingDelete = async () => {
     try {
@@ -309,70 +270,3 @@ const styles = StyleSheet.create({
       left: 10,
     },
   });
-  
-
-
-// import { AddProductTocart } from "../firebase/Cart";
-
-// const ProductPage = ({ id, hasRatedd }) => {
-
-
- 
-
-  
-  
-
-//   return (
-//     // <View style={styles.container}>
-//     //   <View style={styles.imageContainer}>
-//     //     <Pressable onPress={() => router.back()} style={styles.backButton}>
-//     //       <Image
-//     //         style={{ width: 25, height: 25, borderRadius: 100 }}
-//     //         source={require("../assets/images/th_1.jpg")}
-//     //       />
-//     //     </Pressable>
-//     //     <Image
-//     //       style={{ width: "100%", height: "100%" }}
-//     //       source={{ uri: product.photoURL }}
-//     //     />
-//     //   </View>
-//     //   <View style={styles.productDetails}>
-//     //     <Text style={styles.productName}>
-//     //       {product ? product.name : "Loading..."}
-//     //     </Text>
-//     //     <Text style={styles.price}>Price per item: ${product.price}</Text>
-//     //   </View>
-      
-//     </View>
-//   );
-// };
-
-// const styles = StyleSheet.create({
-
- 
-  
-//   productDetails: {
-//     flexDirection: "row",
-//     justifyContent: "space-between",
-//     alignItems: "center",
-//     width: "100%",
-//     paddingHorizontal: 10,
-//     paddingBottom: 10,
-//     // marginTop:20,
-//     backgroundColor: "#636970",
-//     paddingTop: 7,
-//   },
-//   productName: {
-//     fontSize: 16,
-//     fontWeight: "bold",
-//     color: "white",
-//   },
-//   price: {
-//     fontSize: 16,
-//     fontWeight: "bold",
-//     color: "white",
-//   },
-  
-// });
-
-// export default ProductPage;
